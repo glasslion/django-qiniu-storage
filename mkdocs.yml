@@ -1,0 +1,7 @@
+site_name: Django Qiniu Storage
+site_author: Lijian ZHou
+pages:
+- [index.md, Home]
+
+theme: readthedocs
+dev_addr: 0.0.0.0:8000
