@@ -32,6 +32,11 @@ Django Qiniu Storage 需要以下几个配置才能正常工作。这些配置�
 
     DEFAULT_FILE_STORAGE = 'qiniustorage.backends.QiniuStorage'
 
+## Documentation
+
+It's hosted on the [Read The Doc](http://django-qiniu-storage.readthedocs.org/zh_CN/latest/
+).
+
 ## License
 
 基于MIT许可证发布
