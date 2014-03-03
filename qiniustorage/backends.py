@@ -30,7 +30,7 @@ def get_qiniu_config(name):
     Get configuration variable from environment variable
     or django setting.py
     """
-    config = os.environ.get(name, settings.get(name, None))
+    config = os.environ.get(name, getattr(settings, name, None))
     if config:
         return config
     else:
@@ -91,17 +91,18 @@ class QiniuStorage(Storage):
                 "Failed to delete file '%s'. "
                 "Error message: %s" % (name, err))
 
-    def _file_stat(self, name):
+    def _file_stat(self, name, silent=False):
         name = self._clean_name(name)
         ret, err = qiniu.rs.Client().stat(self.bucket_name, name)
         if err:
-            raise IOError(
-                "Failed to get stats of file '%s'. "
-                "Error message: %s" % (name, err))
+            if not silent:
+                raise IOError(
+                    "Failed to get stats of file '%s'. "
+                    "Error message: %s" % (name, err))
         return ret
 
     def exists(self, name):
-        stats = self._file_stat(name)
+        stats = self._file_stat(name, silent=True)
         return True if stats else False
 
     def size(self, name):
@@ -134,7 +135,7 @@ class QiniuStorage(Storage):
         return list(dirs), files
 
     def url(self, name):
-        return urljoin(self.bucket_domain, name)
+        return urljoin("http://" + self.bucket_domain, name)
 
 
 class QiniuFile(File):
