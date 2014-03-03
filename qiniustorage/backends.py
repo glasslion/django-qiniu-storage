@@ -49,6 +49,7 @@ class QiniuStorage(Storage):
     """
     Qiniu Storage Service
     """
+    location = ""
     def __init__(
             self,
             access_key=QINIU_ACCESS_KEY,
@@ -66,12 +67,14 @@ class QiniuStorage(Storage):
             return name.encode('utf-8')
         else:
             return name
+    def _normalize_name(self, name):
+        return ("%s/%s"% (self.location, name.lstrip('/'))).lstrip('/')
 
     def _open(self, name, mode='rb'):
         return QiniuFile(name, self, mode)
 
     def _save(self, name, content):
-        name = self._clean_name(name)
+        name = self._normalize_name(self._clean_name(name))
         ret, err = qiniu.io.put(self.put_policy.token(), name, content)
         content.close()
         if err:
@@ -84,7 +87,7 @@ class QiniuStorage(Storage):
         return requests.get(self.url(name)).content
 
     def delete(self, name):
-        name = self._clean_name(name)
+        name = self._normalize_name(self._clean_name(name))
         ret, err = qiniu.rs.Client().delete(self.bucket_name, name)
         if err:
             raise IOError(
@@ -92,7 +95,7 @@ class QiniuStorage(Storage):
                 "Error message: %s" % (name, err))
 
     def _file_stat(self, name, silent=False):
-        name = self._clean_name(name)
+        name = self._normalize_name(self._clean_name(name))
         ret, err = qiniu.rs.Client().stat(self.bucket_name, name)
         if err:
             if not silent:
@@ -115,7 +118,7 @@ class QiniuStorage(Storage):
         return datetime.datetime.fromtimestamp(time_stamp)
 
     def listdir(self, name):
-        name = self._clean_name(name)
+        name = self._normalize_name(self._clean_name(name))
         if name and not name.endswith('/'):
             name += '/'
 
@@ -137,10 +140,15 @@ class QiniuStorage(Storage):
     def url(self, name):
         return urljoin("http://" + self.bucket_domain, name)
 
+class QiniuMediaStorage(QiniuStorage):
+    location = settings.MEDIA_ROOT.strip('/')
+
+class QiniuStaticStorage(QiniuStorage):
+    location = settings.STATIC_ROOT.strip('/')
 
 class QiniuFile(File):
     def __init__(self, name, storage, mode):
-        self._name = name
+        self._name = name[len(self._storage.location):].lstrip('/')
         self._storage = storage
         self._mode = mode
         self.file = StringIO()

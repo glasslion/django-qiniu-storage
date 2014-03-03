@@ -65,7 +65,7 @@ USE_L10N = True
 
 USE_TZ = True
 
-DEFAULT_FILE_STORAGE = 'qiniustorage.backends.QiniuStorage'
-STATICFILES_STORAGE  = 'qiniustorage.backends.QiniuStorage'
+DEFAULT_FILE_STORAGE = 'qiniustorage.backends.QiniuMediaStorage'
+STATICFILES_STORAGE  = 'qiniustorage.backends.QiniuStaticStorage'
 
 
