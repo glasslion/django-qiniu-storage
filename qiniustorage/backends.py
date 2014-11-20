@@ -138,6 +138,7 @@ class QiniuStorage(Storage):
         return list(dirs), files
 
     def url(self, name):
+        name = self._normalize_name(self._clean_name(name))
         return urljoin("http://" + self.bucket_domain, name)
 
 class QiniuMediaStorage(QiniuStorage):
