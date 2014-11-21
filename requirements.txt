@@ -1,2 +1,2 @@
-qiniu
+qiniu==6.1.9
 requests
