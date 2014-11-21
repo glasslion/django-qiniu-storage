@@ -18,7 +18,7 @@ class QiniuStorageTest(unittest.TestCase):
     def tearDown(self):
         try:
             self.storage.delete(self.file._name)
-        except IOError:
+        except (IOError, AttributeError):
             pass
 
     def test_init(self):
