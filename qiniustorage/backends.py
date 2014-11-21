@@ -75,6 +75,11 @@ class QiniuStorage(Storage):
 
     def _save(self, name, content):
         name = self._normalize_name(self._clean_name(name))
+        content.open()
+        if hasattr(content, 'chunks'):
+            content_str = ''.join(chunk for chunk in content.chunks())
+        else:
+            content_str = content.read()
         ret, err = qiniu.io.put(self.put_policy.token(), name, content)
         content.close()
         if err:
