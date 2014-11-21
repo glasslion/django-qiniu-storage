@@ -131,12 +131,12 @@ class QiniuStorage(Storage):
         if name and not name.endswith('/'):
             name += '/'
 
-        dirlist = bucket_lister(self.bucket_name)
+        dirlist = bucket_lister(self.bucket_name, prefix=name)
         files = []
         dirs = set()
         base_parts = name.split("/")[:-1]
         for item in dirlist:
-            parts = item.name.split("/")
+            parts = item['key'].split("/")
             parts = parts[len(base_parts):]
             if len(parts) == 1:
                 # File
