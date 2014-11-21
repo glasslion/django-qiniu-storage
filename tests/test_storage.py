@@ -90,3 +90,25 @@ class QiniuStorageTest(unittest.TestCase):
 
         self.file.close()
         assert self.storage.exists(ASSET_FILE_NAME) == True
+
+    def test_listdir(self):
+        dirnames = ['', 'foo', 'bar']
+        filenames = ['file1', 'file2', 'file3']
+        for dirname in dirnames:
+            for filename in filenames:
+                fil = self.storage.open(join(dirname, filename), 'w')
+                fil.write('test text')
+                fil.close()
+
+        dirs, files = self.storage.listdir('/')
+        assert dirs == ['foo', 'bar']
+        assert files == filenames
+
+        dirs, files = self.storage.listdir('foo')
+        assert dirs == []
+        assert files == filenames
+
+        for dirname in dirnames:
+            for filename in filenames:
+                self.storage.delete(join(dirname, filename))
+   
