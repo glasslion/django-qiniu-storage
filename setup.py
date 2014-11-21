@@ -32,7 +32,7 @@ with codecs.open('DESCRIPTION.rst', encoding='utf-8') as f:
 
 setup(
     name="django-qiniu-storage",
-    version='0.1.0',
+    version='1.0.0',
     description="Django storage for Qiniu Cloud Storage",
     long_description=long_description,
 
