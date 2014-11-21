@@ -175,7 +175,11 @@ class QiniuFile(File):
         if not self._is_read:
             self.file = StringIO(self._storage._read(self._name))
             self._is_read = True
-        return self.file.read(num_bytes)
+
+        if num_bytes is None:
+            return self.file.read()
+        else:
+            return self.file.read(num_bytes) 
 
     def write(self, content):
         if 'w' not in self._mode:
