@@ -154,8 +154,8 @@ class QiniuStaticStorage(QiniuStorage):
 
 class QiniuFile(File):
     def __init__(self, name, storage, mode):
-        self._name = name[len(self._storage.location):].lstrip('/')
         self._storage = storage
+        self._name = name[len(self._storage.location):].lstrip('/')
         self._mode = mode
         self.file = StringIO()
         self._is_dirty = False
