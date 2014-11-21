@@ -8,7 +8,7 @@ Django storage for [七牛云存储](http://www.qiniu.com/)
 
 ## Configurations
 
-Django Qiniu Storage 需要以下几个配置才能正常工作。这些配置可以环境变量或 setting.py 来设置。环境变量的优先级要高于 setting.py 。
+Django Qiniu Storage 需要以下几个配置才能正常工作。这些配置通过可以环境变量或 setting.py 来设置。环境变量的优先级要高于 setting.py 。
 
     QINIU_ACCESS_KEY
 
