@@ -80,13 +80,17 @@ class QiniuStorage(Storage):
             content_str = ''.join(chunk for chunk in content.chunks())
         else:
             content_str = content.read()
-        ret, err = qiniu.io.put(self.put_policy.token(), name, content)
+
+        self._put_file(name, content_str)
         content.close()
+        return name
+
+    def _put_file(self, name, content):
+        ret, err = qiniu.io.put(self.put_policy.token(), name, content)
         if err:
             raise IOError(
-                "Failed to save file '%s'. "
+                "Failed to put file '%s'. "
                 "Error message: %s" % (name, err))
-        return name
 
     def _read(self, name):
         return requests.get(self.url(name)).content
