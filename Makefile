@@ -59,7 +59,6 @@ release: clean
 	pandoc --from=markdown_github --to=rst --output=DESCRIPTION.rst README.md
 	python setup.py sdist upload
 	python setup.py bdist_wheel upload
-	-rm DESCRIPTION.rst
 
 dist: clean
 	pandoc --from=markdown_github --to=rst --output=DESCRIPTION.rst README.md
