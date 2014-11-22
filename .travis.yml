@@ -7,8 +7,13 @@ python:
 install:
 - pip install .
 - pip install -r requirements.txt
+- pip install django==$DJANGO_VERSION
 script: py.test
 env:
+  - DJANGO_VERSION=1.7
+  - DJANGO_VERSION=1.6
+  - DJANGO_VERSION=1.5
+  - DJANGO_VERSION=1.4
   matrix:
   - secure: BXtAXXOy9ArgcnVQWPEI5IXHZTMCrF7MDOKWck9my52JTG5krneJ0l3U2ZEuUI3U+B/GMwPQg10oYY5rcQzIwVcorzKI6si/ubNZptfk2X8rEWui0nDtAJ8MOI5DWGjR3vMaEOARjnYlrPH7ovrpThNP6B4sBVUXVtPw1HQd6sI=
   - secure: Wwgy2OvOke3Ob6ankzcWSNujCMLg+ioNZWKz3YkPMqeaEfchuCD0c/Q3So87YYDXoWJg85n+CuzhBmbPy4HPWEoQm4hFj7SEtMGK5jQpAorZfG5VEOGc8utywPrpDQqGuIGJSEc4fSGB7f3F+nDylyo2wd55/C45EutWFMtlPp8=
