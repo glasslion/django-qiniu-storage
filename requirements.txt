@@ -1,2 +1,4 @@
 qiniu<7
 requests
+pytest
+
