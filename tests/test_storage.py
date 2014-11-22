@@ -8,7 +8,13 @@ import django
 import pytest
 
 os.environ.setdefault("DJANGO_SETTINGS_MODULE", "demo-project.settings")
-django.setup()
+
+try:
+    django.setup()
+except AttributeError:
+   # Setup isn't necessary in Django < 1.7
+   pass
+
 from django.conf import settings
 from qiniustorage.backends import QiniuStorage, QiniuFile
 
