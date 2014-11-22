@@ -3,6 +3,7 @@ from datetime import datetime
 import os
 from os.path import dirname,join
 import unittest
+import uuid
 
 import django
 import pytest
@@ -100,21 +101,22 @@ class QiniuStorageTest(unittest.TestCase):
     def test_listdir(self):
         dirnames = ['', 'foo', 'bar']
         filenames = ['file1', 'file2', 'file3']
+        unique_path = str(uuid.uuid4())
         for dirname in dirnames:
             for filename in filenames:
-                fil = self.storage.open(join(dirname, filename), 'w')
+                fil = self.storage.open(join(unique_path, dirname, filename), 'w')
                 fil.write('test text')
                 fil.close()
 
-        dirs, files = self.storage.listdir('/')
+        dirs, files = self.storage.listdir(unique_path)
         assert dirs == ['foo', 'bar']
         assert files == filenames
 
-        dirs, files = self.storage.listdir('foo')
+        dirs, files = self.storage.listdir(join(unique_path, 'foo'))
         assert dirs == []
         assert files == filenames
 
         for dirname in dirnames:
             for filename in filenames:
-                self.storage.delete(join(dirname, filename))
+                self.storage.delete(join(unique_path, dirname, filename))
    
