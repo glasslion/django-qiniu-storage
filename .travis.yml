@@ -21,4 +21,4 @@ env:
 
 matrix:
   exclued:
-  - python: '2.6'
+  - env: DJANGO_VERSION=1.6
