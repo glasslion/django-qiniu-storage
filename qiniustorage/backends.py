@@ -75,7 +75,12 @@ class QiniuStorage(Storage):
 
     def _save(self, name, content):
         name = self._normalize_name(self._clean_name(name))
-        content.open()
+
+        if hasattr(content, 'open'):
+            # Since Django 1.6, content should be a instance
+            # of `django.core.files.File`
+            content.open()
+
         if hasattr(content, 'chunks'):
             content_str = ''.join(chunk for chunk in content.chunks())
         else:
