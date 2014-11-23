@@ -19,6 +19,7 @@ except AttributeError:
 from django.conf import settings
 from qiniustorage.backends import QiniuStorage, QiniuFile
 
+UNIQUE_PATH = str(uuid.uuid4())
 
 class QiniuStorageTest(unittest.TestCase):
     def setUp(self):
@@ -30,7 +31,7 @@ class QiniuStorageTest(unittest.TestCase):
         except (IOError, AttributeError):
             pass
 
-    def test_init(self):
+    def test_file_init(self):
         self.file = fil = QiniuFile('foo', self.storage, mode='rb')
         assert fil._mode == 'rb'
         assert fil._name == "foo"
@@ -42,8 +43,9 @@ class QiniuStorageTest(unittest.TestCase):
 
     def test_write_and_delete_file(self):
         ASSET_FILE_NAME = 'jquery-1.11.1.min.js'
-        assert self.storage.exists(ASSET_FILE_NAME) == False
-        self.file = QiniuFile(ASSET_FILE_NAME, self.storage, mode='wb')
+        REMOTE_PATH = join(UNIQUE_PATH, ASSET_FILE_NAME)
+        assert self.storage.exists(REMOTE_PATH) == False
+        self.file = QiniuFile(REMOTE_PATH, self.storage, mode='wb')
 
         with open(join(dirname(__file__),'assets', ASSET_FILE_NAME), 'rb') as assset_file:
             content = assset_file.read()
@@ -52,25 +54,26 @@ class QiniuStorageTest(unittest.TestCase):
             assset_file_size = assset_file.tell()
             
             self.file.write(content)
-            self.storage._save(ASSET_FILE_NAME, self.file)
+            self.storage._save(REMOTE_PATH, self.file)
             
-            assert self.storage.exists(ASSET_FILE_NAME)
+            assert self.storage.exists(REMOTE_PATH)
 
-        assert self.storage.size(ASSET_FILE_NAME) == assset_file_size
+        assert self.storage.size(REMOTE_PATH) == assset_file_size
 
-        time_delta = datetime.now() - self.storage.modified_time(ASSET_FILE_NAME)
+        time_delta = datetime.now() - self.storage.modified_time(REMOTE_PATH)
         assert time_delta.total_seconds() < 60
 
-        self.storage.delete(ASSET_FILE_NAME)
-        assert self.storage.exists(ASSET_FILE_NAME) == False
+        self.storage.delete(REMOTE_PATH)
+        assert self.storage.exists(REMOTE_PATH) == False
 
     def test_read_file(self):
         ASSET_FILE_NAME = 'bootstrap.min.css'
+        REMOTE_PATH = join(UNIQUE_PATH, ASSET_FILE_NAME)
 
         with open(join(dirname(__file__),'assets', ASSET_FILE_NAME), 'rb') as assset_file:
-            self.storage.save(ASSET_FILE_NAME, assset_file)
+            self.storage.save(REMOTE_PATH, assset_file)
 
-        self.file = self.storage.open(ASSET_FILE_NAME, 'r')
+        self.file = self.storage.open(REMOTE_PATH, 'r')
 
         assert self.file._is_read == False
 
@@ -81,12 +84,13 @@ class QiniuStorageTest(unittest.TestCase):
 
     def test_dirty_file(self):
         ASSET_FILE_NAME = 'bootstrap.min.css'
+        REMOTE_PATH = join(UNIQUE_PATH, ASSET_FILE_NAME)
 
-        self.file = self.storage.open(ASSET_FILE_NAME, 'rw')
+        self.file = self.storage.open(REMOTE_PATH, 'rw')
 
         assert self.file._is_read == False
         assert self.file._is_dirty == False
-        assert self.storage.exists(ASSET_FILE_NAME) == False
+        assert self.storage.exists(REMOTE_PATH) == False
 
         with open(join(dirname(__file__),'assets', ASSET_FILE_NAME), 'r') as assset_file:
             content = assset_file.read()
@@ -96,27 +100,26 @@ class QiniuStorageTest(unittest.TestCase):
         assert self.file._is_dirty == True
 
         self.file.close()
-        assert self.storage.exists(ASSET_FILE_NAME) == True
+        assert self.storage.exists(REMOTE_PATH) == True
 
     def test_listdir(self):
         dirnames = ['', 'foo', 'bar']
         filenames = ['file1', 'file2', 'file3']
-        unique_path = str(uuid.uuid4())
         for dirname in dirnames:
             for filename in filenames:
-                fil = self.storage.open(join(unique_path, dirname, filename), 'w')
+                fil = self.storage.open(join(UNIQUE_PATH, dirname, filename), 'w')
                 fil.write('test text')
                 fil.close()
 
-        dirs, files = self.storage.listdir(unique_path)
+        dirs, files = self.storage.listdir(UNIQUE_PATH)
         assert dirs == ['foo', 'bar']
         assert files == filenames
 
-        dirs, files = self.storage.listdir(join(unique_path, 'foo'))
+        dirs, files = self.storage.listdir(join(UNIQUE_PATH, 'foo'))
         assert dirs == []
         assert files == filenames
 
         for dirname in dirnames:
             for filename in filenames:
-                self.storage.delete(join(unique_path, dirname, filename))
+                self.storage.delete(join(UNIQUE_PATH, dirname, filename))
    
