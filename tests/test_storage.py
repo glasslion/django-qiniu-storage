@@ -61,7 +61,7 @@ class QiniuStorageTest(unittest.TestCase):
         assert self.storage.size(REMOTE_PATH) == assset_file_size
 
         time_delta = datetime.now() - self.storage.modified_time(REMOTE_PATH)
-        assert time_delta.total_seconds() < 60
+        assert time_delta.seconds < 60
 
         self.storage.delete(REMOTE_PATH)
         assert self.storage.exists(REMOTE_PATH) == False
