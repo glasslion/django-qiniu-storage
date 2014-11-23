@@ -8,7 +8,6 @@ install:
 - pip install django==$DJANGO_VERSION
 script: py.test -x
 env:
-  matrix:
   - DJANGO_VERSION=1.7
   - DJANGO_VERSION=1.6
   - DJANGO_VERSION=1.5
@@ -17,8 +16,7 @@ env:
   - QINIU_BUCKET_NAME=django-qiniu-storage
   - QINIU_BUCKET_DOMAIN=django-qiniu-storage.qiniudn.com
   - secure: QVYe9vITrCQw924X7h0vYfHwSDGs6QTaHitM2M31hVkYdBWnYMQZcyW1b5DUcXIOot/Z9+1av77tHgh2nXPA34uR7OIzO+LTtmByEE4fOQwJPDkWvJmF63z6B3eRwH20RPg7sBhzQqEK8KPApTiVjRxw5qsf8yp3+V5aozrKAOg=
-
-
 matrix:
-  exclued:
+  exclude:
+  - python: '2.6'
   - env: DJANGO_VERSION=1.6
