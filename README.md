@@ -37,6 +37,10 @@ Django Qiniu Storage 需要以下几个配置才能正常工作。这些配置�
 It's hosted on the [Read The Doc](http://django-qiniu-storage.readthedocs.org/zh_CN/latest/
 ).
 
+## Changelog
+- 1.1.0 加上了比较完整的单元测试。Django 1.7 相关的 bug fix.
+- 1.0.1 Bug fix. 使用 6.x 版本的 七牛 Python SDK.
+
 ## License
 
 基于MIT许可证发布
