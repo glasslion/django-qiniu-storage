@@ -4,7 +4,8 @@ import httplib
 
 if getattr(httplib, "_IMPLEMENTATION", None) != "gae":
     # httplib._IMPLEMENTATION is "gae" on GAE
-    import httplib_chunk as httplib
+    pass
+    #import httplib_chunk as httplib
 
 import json
 import cStringIO
@@ -52,7 +53,6 @@ class Client(object):
             # ignore empty body when success
             pass
         except Exception, e:
-            raise
             return None, str(e)+path, 0
 
         if resp.status >= 400:
