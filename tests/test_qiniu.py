@@ -1,4 +1,5 @@
 import os
+from os.path import dirname, join
 import uuid
 
 import qiniu.conf
@@ -23,7 +24,7 @@ def test_put_file():
         text = assset_file.read()
 
     print "Test text: %s" % text
-    ret, err = qiniu.io.put(token, str(uuid.uuid4())+ASSET_FILE_NAME, text)
+    ret, err = qiniu.io.put(token, join(str(uuid.uuid4()), ASSET_FILE_NAME), text)
     if err:
         raise IOError(
             "Error message: %s" % err)
