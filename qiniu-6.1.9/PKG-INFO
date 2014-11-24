@@ -1,0 +1,21 @@
+Metadata-Version: 1.1
+Name: qiniu
+Version: 6.1.9
+Summary: Qiniu Resource Storage SDK for Python 2.X.
+Home-page: https://github.com/qiniu/python-sdk
+Author: Shanghai Qiniu Information Technologies Co., Ltd.
+Author-email: support@qiniu.com
+License: MIT
+Description: see:
+        https://github.com/qiniu/python-sdk
+        
+Platform: any
+Classifier: Intended Audience :: Developers
+Classifier: License :: OSI Approved :: MIT License
+Classifier: Operating System :: OS Independent
+Classifier: Programming Language :: Python
+Classifier: Programming Language :: Python :: 2
+Classifier: Programming Language :: Python :: 2.6
+Classifier: Programming Language :: Python :: 2.7
+Classifier: Topic :: Internet :: WWW/HTTP :: Dynamic Content
+Classifier: Topic :: Software Development :: Libraries :: Python Modules
