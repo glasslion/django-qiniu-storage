@@ -24,6 +24,7 @@ def test_put_file():
         text = assset_file.read()
 
     print "Test text: %s" % text
+    token = QINIU_PUT_POLICY.token()
     ret, err = qiniu.io.put(token, join(str(uuid.uuid4()), ASSET_FILE_NAME), text)
     if err:
         raise IOError(
