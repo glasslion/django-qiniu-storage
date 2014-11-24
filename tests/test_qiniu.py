@@ -22,6 +22,7 @@ def test_put_file():
     ASSET_FILE_NAME = 'jquery-1.11.1.min.js'
     with open(join(dirname(__file__),'assets', ASSET_FILE_NAME), 'rb') as assset_file:
         text = assset_file.read()
+    text = text[:len(text)/10]
 
     print "Test text: %s" % text
     token = QINIU_PUT_POLICY.token()
