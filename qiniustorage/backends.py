@@ -11,10 +11,7 @@ try:
 except ImportError:
     from StringIO import StringIO
 
-import qiniu.conf
-import qiniu.io
-import qiniu.rs
-import qiniu.rsf
+from qiniu import Auth, BucketManager, put_data
 import requests
 
 from django.conf import settings
@@ -56,11 +53,11 @@ class QiniuStorage(Storage):
             secret_key=QINIU_SECRET_KEY,
             bucket_name=QINIU_BUCKET_NAME,
             bucket_domain=QINIU_BUCKET_DOMAIN):
-        qiniu.conf.ACCESS_KEY = access_key
-        qiniu.conf.SECRET_KEY = secret_key
+
+        self.auth = Auth(access_key, secret_key)
         self.bucket_name = bucket_name
-        self.put_policy = qiniu.rs.PutPolicy(self.bucket_name)
         self.bucket_domain = bucket_domain
+        self.bucket_manager = BucketManager(self.auth)
 
     def _clean_name(self, name):
         if type(name) is unicode:
@@ -91,9 +88,9 @@ class QiniuStorage(Storage):
         return name
 
     def _put_file(self, name, content):
-        token = self.put_policy.token()
-        ret, err = qiniu.io.put(token, name, content)
-        if err:
+        token = self.auth.upload_token(self.bucket_name)
+        ret, info = put_data(token, name, content)
+        if ret['key']!= name:
             raise IOError(
                 "Failed to put file '%s'. "
                 "Error message: %s" % (name, err))
@@ -103,20 +100,16 @@ class QiniuStorage(Storage):
 
     def delete(self, name):
         name = self._normalize_name(self._clean_name(name))
-        ret, err = qiniu.rs.Client().delete(self.bucket_name, name)
-        if err:
-            raise IOError(
-                "Failed to delete file '%s'. "
-                "Error message: %s" % (name, err))
+        ret, info = self.bucket_manager.delete(self.bucket_name, name)
+
+        if ret is None or info.status_code ==612:
+            raise IOError("Failed to delete file: %s" % name)
 
     def _file_stat(self, name, silent=False):
         name = self._normalize_name(self._clean_name(name))
-        ret, err = qiniu.rs.Client().stat(self.bucket_name, name)
-        if err:
-            if not silent:
-                raise IOError(
-                    "Failed to get stats of file '%s'. "
-                    "Error message: %s" % (name, err))
+        ret, info = self.bucket_manager.stat(self.bucket_name, name)
+        if ret is None and not silent:
+            raise IOError("Failed to stat file: %s" % name)
         return ret
 
     def exists(self, name):
@@ -137,7 +130,7 @@ class QiniuStorage(Storage):
         if name and not name.endswith('/'):
             name += '/'
 
-        dirlist = bucket_lister(self.bucket_name, prefix=name)
+        dirlist = bucket_lister(self.bucket_manager, self.bucket_name, prefix=name)
         files = []
         dirs = set()
         base_parts = name.split("/")[:-1]

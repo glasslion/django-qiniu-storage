@@ -1,22 +1,22 @@
 """
 Helper functions for the Qiniu Cloud storage
 """
-import qiniu.rsf
 
 
-def bucket_lister(bucket_name, prefix=None, marker=None, limit=None):
+def bucket_lister(manager, bucket_name, prefix=None, marker=None, limit=None):
     """
     A generator function for listing keys in a bucket.
     """
-    rs = qiniu.rsf.Client()
-    err = None
-    while err is None:
-        ret, err = rs.list_prefix(bucket_name, prefix=prefix, limit=limit,
-                                  marker=marker)
-        marker = ret.get('marker', None)
+    eof = False 
+    while not eof:
+        ret, eof, info = manager.list(bucket_name, prefix=prefix, limit=2,
+                                    marker=marker)
+        import pdb; pdb.set_trace()
+        if ret is None:
+            raise IOError("Failed to list bucket '%s'. "
+                          "Error message: %s" % (bucket_name, err))
+        if not eof:
+            marker = ret['marker']
+
         for item in ret['items']:
             yield item
-
-    if err is not qiniu.rsf.EOF:
-        raise IOError("Failed to list bucket '%s'. "
-                      "Error message: %s" % (bucket_name, err))
