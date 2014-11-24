@@ -1,4 +1,4 @@
-# qiniu<7
+qiniu<7
 requests
 pytest
 
