@@ -91,7 +91,8 @@ class QiniuStorage(Storage):
         return name
 
     def _put_file(self, name, content):
-        ret, err = qiniu.io.put(self.put_policy.token(), name, content)
+        token = self.put_policy.token()
+        ret, err = qiniu.io.put(token, name, content)
         if err:
             raise IOError(
                 "Failed to put file '%s'. "
