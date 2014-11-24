@@ -52,12 +52,10 @@ def put(uptoken, key, data, extra=None):
     files = [
         {'filename': fname, 'data': data, 'mime_type': extra.mime_type},
     ]
-    print 'Flag1'
     ret, err, code = rpc.Client(conf.UP_HOST).call_with_multipart("/", fields, files)
     print "code: %s" % code
     if err is None or code / 100 == 4 or code == 579 or code / 100 == 6 or code / 100 == 7:
         return ret, err
-    print flag
     ret, err, code = rpc.Client(conf.UP_HOST2).call_with_multipart("/", fields, files)
     return ret, err
 
