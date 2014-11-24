@@ -19,10 +19,9 @@ qiniu.conf.SECRET_KEY = QINIU_SECRET_KEY
 QINIU_PUT_POLICY= qiniu.rs.PutPolicy(QINIU_BUCKET_NAME)
 
 def test_put_file():
-    ASSET_FILE_NAME = 'jquery-1.11.1.min.js'
+    ASSET_FILE_NAME = 'bootstrap.min.css'
     with open(join(dirname(__file__),'assets', ASSET_FILE_NAME), 'rb') as assset_file:
         text = assset_file.read()
-    text = text[:len(text)/10]
 
     print "Test text: %s" % text
     token = QINIU_PUT_POLICY.token()
