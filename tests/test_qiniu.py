@@ -1,6 +1,5 @@
 import os
-import random
-import string
+import uuid
 
 import qiniu.conf
 import qiniu.io
@@ -19,10 +18,12 @@ qiniu.conf.SECRET_KEY = QINIU_SECRET_KEY
 QINIU_PUT_POLICY= qiniu.rs.PutPolicy(QINIU_BUCKET_NAME)
 
 def test_put_file():
-    token = QINIU_PUT_POLICY.token()
-    text = "".join( [random.choice(string.letters) for i in xrange(200)])
+    ASSET_FILE_NAME = 'bootstrap.min.css'
+    with open(join(dirname(__file__),'assets', ASSET_FILE_NAME), 'rb') as assset_file:
+        text = assset_file.read()
+
     print "Test text: %s" % text
-    ret, err = qiniu.io.put(token, text[:10], text)
+    ret, err = qiniu.io.put(token, str(uuid.uuid4())+ASSET_FILE_NAME, text)
     if err:
         raise IOError(
             "Error message: %s" % err)
