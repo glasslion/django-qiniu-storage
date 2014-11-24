@@ -53,6 +53,7 @@ class Client(object):
             # ignore empty body when success
             pass
         except Exception, e:
+            raise
             return None, str(e)+path, 0
 
         if resp.status >= 400:
