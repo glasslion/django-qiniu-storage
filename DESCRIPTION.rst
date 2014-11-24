@@ -14,7 +14,7 @@ Configurations
 --------------
 
 Django Qiniu Storage
-需要以下几个配置才能正常工作。这些配置可以环境变量或 setting.py
+需要以下几个配置才能正常工作。这些配置通过可以环境变量或 setting.py
 来设置。环境变量的优先级要高于 setting.py 。
 
 ::
@@ -56,6 +56,12 @@ Documentation
 
 It's hosted on the `Read The
 Doc <http://django-qiniu-storage.readthedocs.org/zh_CN/latest/>`__.
+
+Changelog
+---------
+
+-  1.1.0 加上了比较完整的单元测试。Django 1.7 相关的 bug fix.
+-  1.0.1 Bug fix. 使用 6.x 版本的 七牛 Python SDK.
 
 License
 -------
