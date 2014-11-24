@@ -1,4 +1,4 @@
-qiniu
 requests
+qiniu
 pytest
 
