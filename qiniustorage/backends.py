@@ -176,8 +176,6 @@ class QiniuFile(File):
         return self._size
 
     def read(self, num_bytes=None):
-        if self._is_dirty:
-            raise IOError("The file has beeen changed. Please save it before read again.")
         if not self._is_read:
             self.file = StringIO(self._storage._read(self._name))
             self._is_read = True
