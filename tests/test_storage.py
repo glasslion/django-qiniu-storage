@@ -24,7 +24,7 @@ from qiniustorage.utils import QiniuError
 
 USING_TRAVIS = os.environ.get('USING_TRAVIS', None) is None
 if USING_TRAVIS:
-    set_default(default_up_host='up.qiniug.com')
+    set_default(default_up_host='up.qiniug.com', connection_retries=20)
 
 UNIQUE_PATH = str(uuid.uuid4())
 
