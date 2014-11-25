@@ -18,6 +18,7 @@ except AttributeError:
 
 from django.conf import settings
 from qiniustorage.backends import QiniuStorage, QiniuFile
+from qiniustorage.utils import QiniuError
 
 UNIQUE_PATH = str(uuid.uuid4())
 
@@ -28,7 +29,7 @@ class QiniuStorageTest(unittest.TestCase):
     def tearDown(self):
         try:
             self.storage.delete(self.file._name)
-        except (IOError, AttributeError):
+        except (QiniuError, AttributeError):
             pass
 
     def test_file_init(self):

@@ -19,7 +19,7 @@ from django.core.files.base import File
 from django.core.files.storage import Storage
 from django.core.exceptions import ImproperlyConfigured
 
-from .utils import bucket_lister
+from .utils import QiniuError, bucket_lister
 
 
 def get_qiniu_config(name):
@@ -91,9 +91,7 @@ class QiniuStorage(Storage):
         token = self.auth.upload_token(self.bucket_name)
         ret, info = put_data(token, name, content)
         if ret['key']!= name:
-            raise IOError(
-                "Failed to put file '%s'. "
-                "Error message: %s" % (name, err))
+            raise QiniuError(info)
 
     def _read(self, name):
         return requests.get(self.url(name)).content
@@ -103,13 +101,13 @@ class QiniuStorage(Storage):
         ret, info = self.bucket_manager.delete(self.bucket_name, name)
 
         if ret is None or info.status_code ==612:
-            raise IOError("Failed to delete file: %s" % name)
+            raise QiniuError(info)
 
     def _file_stat(self, name, silent=False):
         name = self._normalize_name(self._clean_name(name))
         ret, info = self.bucket_manager.stat(self.bucket_name, name)
         if ret is None and not silent:
-            raise IOError("Failed to stat file: %s" % name)
+            raise QiniuError(info)
         return ret
 
     def exists(self, name):

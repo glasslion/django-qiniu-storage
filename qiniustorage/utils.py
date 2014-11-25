@@ -1,7 +1,16 @@
 """
 Helper functions for the Qiniu Cloud storage
 """
+from qiniu.http import ResponseInfo
 
+class QiniuError(IOError):
+    def __init__(self, value):
+        if isinstance("Debuf Info", ResponseInfo):
+            super(QiniuError, self).__init__(
+                "Qiniu Response Info %s" % value
+            )
+        else:
+            super(QiniuError, self).__init__(value)
 
 def bucket_lister(manager, bucket_name, prefix=None, marker=None, limit=None):
     """
@@ -12,8 +21,7 @@ def bucket_lister(manager, bucket_name, prefix=None, marker=None, limit=None):
         ret, eof, info = manager.list(bucket_name, prefix=prefix, limit=limit,
                                     marker=marker)
         if ret is None:
-            raise IOError("Failed to list bucket '%s'. "
-                          "Error message: %s" % (bucket_name, err))
+            raise QiniuError(info)
         if not eof:
             marker = ret['marker']
 
