@@ -165,12 +165,19 @@ class QiniuFile(File):
     @property
     def size(self):
         if self._is_dirty or self._is_read:
-            return self.file.size()
+            # Get the size of a file like object
+            # Check http://stackoverflow.com/a/19079887
+            old_file_position = self.file.tell()
+            self.file.seek(0, os.SEEK_END)
+            self._size = self.file.tell()
+            self.file.seek(old_file_position, os.SEEK_SET)
         if not hasattr(self, '_size'):
             self._size = self._storage.size(self._name)
         return self._size
 
     def read(self, num_bytes=None):
+        if self._is_dirty:
+            raise IOError("The file has beeen changed. Please save it before read again.")
         if not self._is_read:
             self.file = StringIO(self._storage._read(self._name))
             self._is_read = True
