@@ -164,6 +164,8 @@ class QiniuFile(File):
 
     @property
     def size(self):
+        if self._is_dirty or self._is_read:
+            return self.file.size()
         if not hasattr(self, '_size'):
             self._size = self._storage.size(self._name)
         return self._size
