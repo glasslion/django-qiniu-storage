@@ -8,6 +8,8 @@ import uuid
 import django
 import pytest
 
+from qiniu import set_default
+
 os.environ.setdefault("DJANGO_SETTINGS_MODULE", "demo-project.settings")
 
 try:
@@ -19,6 +21,10 @@ except AttributeError:
 from django.conf import settings
 from qiniustorage.backends import QiniuStorage, QiniuFile
 from qiniustorage.utils import QiniuError
+
+USING_TRAVIS = os.environ.get('USING_TRAVIS', None) is None
+if USING_TRAVIS:
+    set_default(default_up_host='up.qiniug.com')
 
 UNIQUE_PATH = str(uuid.uuid4())
 
