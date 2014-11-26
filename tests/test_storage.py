@@ -121,11 +121,11 @@ class QiniuStorageTest(unittest.TestCase):
                 fil.close()
 
         dirs, files = self.storage.listdir(UNIQUE_PATH)
-        assert dirs == ['foo', 'bar']
+        assert sorted(dirs) == sorted(['foo', 'bar'])
 
         dirs, files = self.storage.listdir(join(UNIQUE_PATH, 'foo'))
         assert dirs == []
-        assert files == filenames
+        assert sorted(files) == sorted(filenames)
 
    
     @classmethod
