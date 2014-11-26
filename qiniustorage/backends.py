@@ -88,7 +88,7 @@ class QiniuStorage(Storage):
     def _put_file(self, name, content):
         token = self.auth.upload_token(self.bucket_name)
         ret, info = put_data(token, name, content)
-        if ret['key']!= name:
+        if ret is None or ret['key']!= name:
             raise QiniuError(info)
 
     def _read(self, name):
