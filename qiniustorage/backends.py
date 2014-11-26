@@ -1,15 +1,14 @@
 """
 Qiniu Storage Backends
 """
-from __future__ import absolute_import
+from __future__ import absolute_import, unicode_literals
 import datetime
 import os
-from urlparse import urljoin
 
-try:
-    from cStringIO import StringIO
-except ImportError:
-    from StringIO import StringIO
+from six import BytesIO
+from six.moves import cStringIO as StringIO
+from six.moves.urllib_parse import urljoin, urlparse
+
 
 from qiniu import Auth, BucketManager, put_data
 import requests
@@ -18,6 +17,7 @@ from django.conf import settings
 from django.core.files.base import File
 from django.core.files.storage import Storage
 from django.core.exceptions import ImproperlyConfigured
+from django.utils.encoding import force_text, force_bytes
 
 from .utils import QiniuError, bucket_lister
 
@@ -60,10 +60,8 @@ class QiniuStorage(Storage):
         self.bucket_manager = BucketManager(self.auth)
 
     def _clean_name(self, name):
-        if type(name) is unicode:
-            return name.encode('utf-8')
-        else:
-            return name
+        return force_text(name)
+
     def _normalize_name(self, name):
         return ("%s/%s"% (self.location, name.lstrip('/'))).lstrip('/')
 
@@ -79,7 +77,7 @@ class QiniuStorage(Storage):
             content.open()
 
         if hasattr(content, 'chunks'):
-            content_str = ''.join(chunk for chunk in content.chunks())
+            content_str = b''.join(chunk for chunk in content.chunks())
         else:
             content_str = content.read()
 
@@ -158,7 +156,12 @@ class QiniuFile(File):
         self._storage = storage
         self._name = name[len(self._storage.location):].lstrip('/')
         self._mode = mode
-        self.file = StringIO()
+        # if 'b' in mode:
+        #     self._file_class = BytesIO
+        # else:
+        #     self._file_class = StringIO
+        # self.file = self._file_class()
+        self.file = BytesIO()
         self._is_dirty = False
         self._is_read = False
 
@@ -177,18 +180,26 @@ class QiniuFile(File):
 
     def read(self, num_bytes=None):
         if not self._is_read:
-            self.file = StringIO(self._storage._read(self._name))
+            content = self._storage._read(self._name)
+            self.file = BytesIO(content)
             self._is_read = True
 
         if num_bytes is None:
-            return self.file.read()
+            data = self.file.read()
         else:
-            return self.file.read(num_bytes) 
+            data = self.file.read(num_bytes)
+
+        if 'b' in self._mode:
+            return data
+        else:
+            return force_text(data)
+
 
     def write(self, content):
         if 'w' not in self._mode:
             raise AttributeError("File was opened for read-only access.")
-        self.file.write(content)
+        
+        self.file.write(force_bytes(content))
         self._is_dirty = True
         self._is_read = True
 
