@@ -6,11 +6,9 @@ python:
 - '3.4'
 install:
 - pip install -r requirements.txt
-- pip install qiniu
 - pip install django==$DJANGO_VERSION
 - pip install -e .
-script: py.test tests/test_storage.py
-env:
+script: py.test
   matrix:
   - DJANGO_VERSION=1.7
   - DJANGO_VERSION=1.6
