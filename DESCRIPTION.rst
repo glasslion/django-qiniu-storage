@@ -60,6 +60,12 @@ Doc <http://django-qiniu-storage.readthedocs.org/zh_CN/latest/>`__.
 Changelog
 ---------
 
+-  2.0.0 使用 7.x 版本的 Python SDK。同时支持 Python 2 和 Python 3，
+   但也因此不再支持 Django 1.4。
+-  新建 ”1.x“ 分支。 今后主分支将使用 7.x 版本的 Python SDK。2.x
+   会同时支持 Python 2 和 Python 3。
+-  1.2.0 主要是测试方面的改进。利用 Travic CI 对 (Python 2.6, 2.7)×(
+   Django 1.4 -1.7) 的每个组合都跑一遍单元测试。
 -  1.1.0 加上了比较完整的单元测试。Django 1.7 相关的 bug fix.
 -  1.0.1 Bug fix. 使用 6.x 版本的 七牛 Python SDK.
 
