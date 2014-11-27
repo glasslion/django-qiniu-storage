@@ -1,7 +1,7 @@
 Django>=1.5
 requests
 six
-
+qiniu>=7.0.1
 
 # Tests
 pytest
