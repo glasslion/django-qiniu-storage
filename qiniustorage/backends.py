@@ -156,11 +156,6 @@ class QiniuFile(File):
         self._storage = storage
         self._name = name[len(self._storage.location):].lstrip('/')
         self._mode = mode
-        # if 'b' in mode:
-        #     self._file_class = BytesIO
-        # else:
-        #     self._file_class = StringIO
-        # self.file = self._file_class()
         self.file = BytesIO()
         self._is_dirty = False
         self._is_read = False
