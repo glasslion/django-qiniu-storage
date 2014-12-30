@@ -54,3 +54,4 @@ docs/_build/
 
 .python-version
 .secret
+*.sqlite3
