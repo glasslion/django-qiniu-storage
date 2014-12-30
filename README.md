@@ -12,7 +12,7 @@
 
 ## Configurations
 
-Django Qiniu Storage 需要以下几个配置才能正常工作。这些配置通过可以环境变量或 setting.py 来设置。环境变量的优先级要高于 setting.py 。
+Django Qiniu Storage 需要以下几个配置才能正常工作。这些配置通过可以环境变量或 settings.py 来设置。环境变量的优先级要高于 settings.py 。
 
 | Django Settings / Environment Variable | 说明                                 |
 |----------------------------------------|--------------------------------------|
@@ -23,7 +23,7 @@ Django Qiniu Storage 需要以下几个配置才能正常工作。这些配置�
 
 ## Usage
 
-在 setting.py 里设置 `DEFAULT_FILE_STORAGE` 为 `qiniustorage.backends.QiniuStorage`
+在 settings.py 里设置 `DEFAULT_FILE_STORAGE` 为 `qiniustorage.backends.QiniuStorage`
 
     DEFAULT_FILE_STORAGE = 'qiniustorage.backends.QiniuStorage'
 
