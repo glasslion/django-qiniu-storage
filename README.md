@@ -14,21 +14,12 @@
 
 Django Qiniu Storage 需要以下几个配置才能正常工作。这些配置通过可以环境变量或 setting.py 来设置。环境变量的优先级要高于 setting.py 。
 
-    QINIU_ACCESS_KEY
-
-七牛给开发者分配的 AccessKey
-
-    QINIU_SECRET_KEY
-    
-七牛给开发者分配的 Secret 
-
-    QINIU_BUCKET_NAME
-    
-用来存放文件的七牛空间(bucket)的名字
-
-    QINIU_BUCKET_DOMAIN
-    
-七牛空间(bucket)的域名
+| Django Settings / Environment Variable | 说明                                 |
+|----------------------------------------|--------------------------------------|
+| QINIU_ACCESS_KEY                       | 七牛给开发者分配的 AccessKey         |
+| QINIU_SECRET_KEY                       | 七牛给开发者分配的 Secret            |
+| QINIU_BUCKET_NAME                      | 用来存放文件的七牛空间(bucket)的名字 |
+| QINIU_BUCKET_DOMAIN                    | 七牛空间(bucket)的域名               |
 
 ## Usage
 
