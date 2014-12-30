@@ -146,10 +146,10 @@ class QiniuStorage(Storage):
         return urljoin("http://" + self.bucket_domain, name)
 
 class QiniuMediaStorage(QiniuStorage):
-    location = settings.MEDIA_ROOT.strip('/')
+    location = 'media'
 
 class QiniuStaticStorage(QiniuStorage):
-    location = settings.STATIC_ROOT.strip('/')
+    location = 'static'
 
 class QiniuFile(File):
     def __init__(self, name, storage, mode):
