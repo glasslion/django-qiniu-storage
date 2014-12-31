@@ -12,29 +12,31 @@
 
 ## Configurations
 
-Django Qiniu Storage 需要以下几个配置才能正常工作。这些配置通过可以环境变量或 setting.py 来设置。环境变量的优先级要高于 setting.py 。
+Django Qiniu Storage 需要以下几个配置才能正常工作。这些配置通过可以环境变量或 settings.py 来设置。环境变量的优先级要高于 settings.py 。
 
-    QINIU_ACCESS_KEY
-
-七牛给开发者分配的 AccessKey
-
-    QINIU_SECRET_KEY
-    
-七牛给开发者分配的 Secret 
-
-    QINIU_BUCKET_NAME
-    
-用来存放文件的七牛空间(bucket)的名字
-
-    QINIU_BUCKET_DOMAIN
-    
-七牛空间(bucket)的域名
+| Django Settings / Environment Variable | 说明                                 |
+|----------------------------------------|--------------------------------------|
+| QINIU_ACCESS_KEY                       | 七牛给开发者分配的 AccessKey         |
+| QINIU_SECRET_KEY                       | 七牛给开发者分配的 Secret            |
+| QINIU_BUCKET_NAME                      | 用来存放文件的七牛空间(bucket)的名字 |
+| QINIU_BUCKET_DOMAIN                    | 七牛空间(bucket)的域名               |
 
 ## Usage
 
-在 setting.py 里设置 `DEFAULT_FILE_STORAGE` 为 `qiniustorage.backends.QiniuStorage`
+如果你对 Django 的 Storage 系统尚不熟悉的话， Django 官方文档中的这几篇: [Managing files](https://docs.djangoproject.com/en/1.7/topics/files/), [Managing static files](https://docs.djangoproject.com/en/1.7/howto/static-files/), [The staticfiles app](https://docs.djangoproject.com/恩/1.7/ref/contrib/staticfiles/) 都是很不错的阅读材料。 建议阅读完后， 再看本教程。
+
+#### 用例1： 只用七牛托管动态生成的文件（例如用户上传的文件）
+
+在 settings.py 里设置 `DEFAULT_FILE_STORAGE` :
 
     DEFAULT_FILE_STORAGE = 'qiniustorage.backends.QiniuStorage'
+
+#### 用例2： 用七牛托管动态生成的文件以及站点自身的静态文件
+首先，检查你的 `INSTALLED_APPS` setting， 确保安装了 `django.contrib.staticfiles` 这个 app。 
+
+`staticfiles`  提供了一个名为 `collectstatic` 的命令。 它会收集各个 app 的根目录下的 `static` 子目录下的文件， 并汇总到一个地方。如果将 django settings 里的 `STATICFILES_STORAGE` 设置为  `QiniuStorage`， 收集到的静态文件就会被统一上传到七牛。
+
+
 
 ## Documentation
 
