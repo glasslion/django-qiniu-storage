@@ -1,7 +1,12 @@
 Django Qiniu Storage
 ====================
 
+| |Build Status|
+| |Latest Version|
+| |License|
+
 Django storage for `七牛云存储 <http://www.qiniu.com/>`__
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
 Install
 -------
@@ -73,3 +78,10 @@ License
 -------
 
 基于MIT许可证发布
+
+.. |Build Status| image:: https://travis-ci.org/glasslion/django-qiniu-storage.svg?branch=master
+   :target: https://travis-ci.org/glasslion/django-qiniu-storage
+.. |Latest Version| image:: https://pypip.in/version/django-qiniu-storage/badge.svg
+   :target: https://pypi.python.org/pypi/django-qiniu-storage/
+.. |License| image:: https://pypip.in/license/django-qiniu-storage/badge.svg
+   :target: https://pypi.python.org/pypi/django-qiniu-storage/
