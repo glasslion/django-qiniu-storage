@@ -63,7 +63,7 @@ class QiniuStorage(Storage):
         return force_text(name)
 
     def _normalize_name(self, name):
-        return ("%s/%s"% (self.location, name.lstrip('/'))).lstrip('/')
+        return ("%s/%s" % (self.location, name.lstrip('/').lstrip('./'))).lstrip('/')
 
     def _open(self, name, mode='rb'):
         return QiniuFile(name, self, mode)
@@ -88,7 +88,7 @@ class QiniuStorage(Storage):
     def _put_file(self, name, content):
         token = self.auth.upload_token(self.bucket_name)
         ret, info = put_data(token, name, content)
-        if ret is None or ret['key']!= name:
+        if ret is None or ret['key'] != name:
             raise QiniuError(info)
 
     def _read(self, name):
@@ -98,7 +98,7 @@ class QiniuStorage(Storage):
         name = self._normalize_name(self._clean_name(name))
         ret, info = self.bucket_manager.delete(self.bucket_name, name)
 
-        if ret is None or info.status_code ==612:
+        if ret is None or info.status_code == 612:
             raise QiniuError(info)
 
     def _file_stat(self, name, silent=False):
@@ -142,14 +142,17 @@ class QiniuStorage(Storage):
         return list(dirs), files
 
     def url(self, name):
-        name = self._normalize_name(self._clean_name(name))
+        name = self._clean_name(name)
         return urljoin("http://" + self.bucket_domain, name)
+
 
 class QiniuMediaStorage(QiniuStorage):
     location = 'media'
 
+
 class QiniuStaticStorage(QiniuStorage):
     location = 'static'
+
 
 class QiniuFile(File):
     def __init__(self, name, storage, mode):
