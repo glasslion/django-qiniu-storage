@@ -60,7 +60,7 @@ class QiniuStorage(Storage):
         self.bucket_manager = BucketManager(self.auth)
 
     def _clean_name(self, name):
-        return force_text(name)
+        return force_text(name).lstrip('/').lstrip(self.location)
 
     def _normalize_name(self, name):
         return ("%s/%s"% (self.location, name.lstrip('/'))).lstrip('/')
