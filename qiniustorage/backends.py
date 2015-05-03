@@ -60,10 +60,14 @@ class QiniuStorage(Storage):
         self.bucket_manager = BucketManager(self.auth)
 
     def _clean_name(self, name):
-        return force_text(name).lstrip('/').lstrip(self.location)
+        return force_text(name)
 
     def _normalize_name(self, name):
-        return ("%s/%s"% (self.location, name.lstrip('/'))).lstrip('/')
+        name = name.lstrip('/')
+        if name.startswith(self.location + '/'):
+            return name
+        else:
+            return ("%s/%s"% (self.location, name)).lstrip('/')
 
     def _open(self, name, mode='rb'):
         return QiniuFile(name, self, mode)
