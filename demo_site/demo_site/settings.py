@@ -127,7 +127,7 @@ INSTALLED_APPS = (
     'foo',
     'bar',
     # Uncomment the next line to enable the admin:
-    # 'django.contrib.admin',
+    'django.contrib.admin',
     # Uncomment the next line to enable admin documentation:
     # 'django.contrib.admindocs',
 )
@@ -160,5 +160,15 @@ LOGGING = {
         },
     }
 }
+
+
+# auth
+AUTHENTICATION_BACKENDS = (
+    'django.contrib.auth.backends.ModelBackend',
+    'demo_site.auth.SettingsBackend',
+)
+
+ADMIN_LOGIN = 'admin'
+ADMIN_PASSWORD = 'admin'
 
 DEFAULT_FILE_STORAGE = 'qiniustorage.backends.QiniuMediaStorage'
