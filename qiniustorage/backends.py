@@ -4,6 +4,7 @@ Qiniu Storage Backends
 from __future__ import absolute_import, unicode_literals
 import datetime
 import os
+import posixpath
 
 from six import BytesIO
 from six.moves import cStringIO as StringIO
@@ -47,6 +48,7 @@ class QiniuStorage(Storage):
     Qiniu Storage Service
     """
     location = ""
+
     def __init__(
             self,
             access_key=QINIU_ACCESS_KEY,
@@ -60,16 +62,25 @@ class QiniuStorage(Storage):
         self.bucket_manager = BucketManager(self.auth)
 
     def _clean_name(self, name):
-        return force_text(name)
+            """
+            Cleans the name so that Windows style paths work
+            """
+            # Normalize Windows style paths
+            clean_name = posixpath.normpath(name).replace('\\', '/')
 
-    def _normalize_name(self, name):
-        return ("%s/%s" % (self.location, name.lstrip('/').lstrip('./'))).lstrip('/')
+            # os.path.normpath() can strip trailing slashes so we implement
+            # a workaround here.
+            if name.endswith('/') and not clean_name.endswith('/'):
+                # Add a trailing slash as it was stripped.
+                return clean_name + '/'
+            else:
+                return clean_name
 
     def _open(self, name, mode='rb'):
         return QiniuFile(name, self, mode)
 
     def _save(self, name, content):
-        name = self._normalize_name(self._clean_name(name))
+        name = self._clean_name(name)
 
         if hasattr(content, 'open'):
             # Since Django 1.6, content should be a instance
@@ -95,14 +106,16 @@ class QiniuStorage(Storage):
         return requests.get(self.url(name)).content
 
     def delete(self, name):
-        name = self._normalize_name(self._clean_name(name))
+        name = self._clean_name(name)
         ret, info = self.bucket_manager.delete(self.bucket_name, name)
 
         if ret is None or info.status_code == 612:
             raise QiniuError(info)
 
     def _file_stat(self, name, silent=False):
-        name = self._normalize_name(self._clean_name(name))
+        name = self._clean_name(name)
+
+        name = name.encode('utf-8')
         ret, info = self.bucket_manager.stat(self.bucket_name, name)
         if ret is None and not silent:
             raise QiniuError(info)
@@ -122,7 +135,7 @@ class QiniuStorage(Storage):
         return datetime.datetime.fromtimestamp(time_stamp)
 
     def listdir(self, name):
-        name = self._normalize_name(self._clean_name(name))
+        name = self._clean_name(name)
         if name and not name.endswith('/'):
             name += '/'
 
