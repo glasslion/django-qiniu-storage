@@ -99,7 +99,8 @@ class QiniuStorage(Storage):
         return QiniuFile(name, self, mode)
 
     def _save(self, name, content):
-        name = self._normalize_name(self._clean_name(name))
+        cleaned_name = self._clean_name(name)
+        name = self._normalize_name(cleaned_name)
 
         if hasattr(content, 'open'):
             # Since Django 1.6, content should be a instance
@@ -113,7 +114,7 @@ class QiniuStorage(Storage):
 
         self._put_file(name, content_str)
         content.close()
-        return name
+        return cleaned_name
 
     def _put_file(self, name, content):
         token = self.auth.upload_token(self.bucket_name)
