@@ -30,7 +30,7 @@ def get_qiniu_config(name, default=None):
     """
     config = os.environ.get(name, getattr(settings, name, default))
     if config is not None:
-        return config
+        return config.strip()
     else:
         raise ImproperlyConfigured(
             "Can't find config for '%s' either in environment"
@@ -40,9 +40,13 @@ def get_qiniu_config(name, default=None):
 QINIU_ACCESS_KEY = get_qiniu_config('QINIU_ACCESS_KEY')
 QINIU_SECRET_KEY = get_qiniu_config('QINIU_SECRET_KEY')
 QINIU_BUCKET_NAME = get_qiniu_config('QINIU_BUCKET_NAME')
-QINIU_BUCKET_DOMAIN = get_qiniu_config('QINIU_BUCKET_DOMAIN').rstrip('/')
-QINIU_HTTPS_DOMAIN = get_qiniu_config('QINIU_HTTPS_DOMAIN', '').rstrip('/')
+QINIU_BUCKET_DOMAIN = get_qiniu_config('QINIU_BUCKET_DOMAIN', '').rstrip('/')
+QINIU_SECURE_URL = get_qiniu_config('QINIU_SECURE_URL', 'False')
 
+if QINIU_SECURE_URL.lower() in ('true', '1'):
+    QINIU_SECURE_URL = True
+else:
+    QINIU_SECURE_URL = False
 
 class QiniuStorage(Storage):
     """
@@ -55,12 +59,14 @@ class QiniuStorage(Storage):
             access_key=QINIU_ACCESS_KEY,
             secret_key=QINIU_SECRET_KEY,
             bucket_name=QINIU_BUCKET_NAME,
-            bucket_domain=QINIU_BUCKET_DOMAIN):
+            bucket_domain=QINIU_BUCKET_DOMAIN,
+            secure_url=QINIU_SECURE_URL):
 
         self.auth = Auth(access_key, secret_key)
         self.bucket_name = bucket_name
         self.bucket_domain = bucket_domain
         self.bucket_manager = BucketManager(self.auth)
+        self.secure_url = secure_url
 
     def _clean_name(self, name):
             """
@@ -178,10 +184,8 @@ class QiniuStorage(Storage):
     def url(self, name):
         name = self._normalize_name(self._clean_name(name))
         name = filepath_to_uri(name)
-        if QINIU_HTTPS_DOMAIN != '':
-            return urljoin('https://' + QINIU_HTTPS_DOMAIN, name)
-        else:
-            return urljoin('http://' + self.bucket_domain, name)
+        protocol = 'https://' if self.secure_url else 'http://'
+        return urljoin(protocol + self.bucket_domain, name)
 
 
 class QiniuMediaStorage(QiniuStorage):
@@ -241,5 +245,6 @@ class QiniuFile(File):
 
     def close(self):
         if self._is_dirty:
-            self._storage._put_file(self._name, self.file.getvalue())
+            self.file.seek(0)
+            self._storage._save(self._name, self.file)
         self.file.close()
