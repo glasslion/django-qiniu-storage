@@ -64,11 +64,11 @@ MEDIA_URL = ''
 # Don't put anything in this directory yourself; store your static files
 # in apps' "static/" subdirectories and in STATICFILES_DIRS.
 # Example: "/var/www/example.com/static/"
-STATIC_ROOT = join(BASE_DIR, 'assets')
+STATIC_ROOT = ''
 
 # URL prefix for static files.
 # Example: "http://example.com/static/", "http://static.example.com/"
-STATIC_URL = '/static/'
+STATIC_URL = 'https://dn-django-qiniu-storage.qbox.me/static/'
 
 # Additional locations of static files
 STATICFILES_DIRS = (
@@ -172,3 +172,4 @@ ADMIN_LOGIN = 'admin'
 ADMIN_PASSWORD = 'admin'
 
 DEFAULT_FILE_STORAGE = 'qiniustorage.backends.QiniuMediaStorage'
+STATICFILES_STORAGE = 'qiniustorage.backends.QiniuStaticStorage'
