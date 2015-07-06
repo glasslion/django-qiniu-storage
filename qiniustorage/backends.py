@@ -17,7 +17,7 @@ import requests
 from django.conf import settings
 from django.core.files.base import File
 from django.core.files.storage import Storage
-from django.core.exceptions import ImproperlyConfigured
+from django.core.exceptions import ImproperlyConfigured, SuspiciousOperation
 from django.utils.encoding import force_text, force_bytes
 
 from .utils import QiniuError, bucket_lister
@@ -76,11 +76,30 @@ class QiniuStorage(Storage):
             else:
                 return clean_name
 
+    def _normalize_name(self, name):
+        """
+        Normalizes the name so that paths like /path/to/ignored/../something.txt
+        work. We check to make sure that the path pointed to is not outside
+        the directory specified by the LOCATION setting.
+        """
+
+        base_path = force_text(self.location)
+        base_path = base_path.rstrip('/')
+
+        final_path = urljoin(base_path.rstrip('/') + "/", name)
+
+        base_path_len = len(base_path)
+        if (not final_path.startswith(base_path) or
+                final_path[base_path_len:base_path_len + 1] not in ('', '/')):
+            raise SuspiciousOperation("Attempted access to '%s' denied." %
+                                      name)
+        return final_path.lstrip('/')
+
     def _open(self, name, mode='rb'):
         return QiniuFile(name, self, mode)
 
     def _save(self, name, content):
-        name = self._clean_name(name)
+        name = self._normalize_name(self._clean_name(name))
 
         if hasattr(content, 'open'):
             # Since Django 1.6, content should be a instance
@@ -106,14 +125,14 @@ class QiniuStorage(Storage):
         return requests.get(self.url(name)).content
 
     def delete(self, name):
-        name = self._clean_name(name)
+        name = self._normalize_name(self._clean_name(name))
         ret, info = self.bucket_manager.delete(self.bucket_name, name)
 
         if ret is None or info.status_code == 612:
             raise QiniuError(info)
 
     def _file_stat(self, name, silent=False):
-        name = self._clean_name(name)
+        name = self._normalize_name(self._clean_name(name))
 
         name = name.encode('utf-8')
         ret, info = self.bucket_manager.stat(self.bucket_name, name)
@@ -135,7 +154,7 @@ class QiniuStorage(Storage):
         return datetime.datetime.fromtimestamp(time_stamp)
 
     def listdir(self, name):
-        name = self._clean_name(name)
+        name = self._normalize_name(self._clean_name(name))
         if name and not name.endswith('/'):
             name += '/'
 
@@ -155,7 +174,7 @@ class QiniuStorage(Storage):
         return list(dirs), files
 
     def url(self, name):
-        name = self._clean_name(name)
+        name = self._normalize_name(self._clean_name(name))
         return urljoin("http://" + self.bucket_domain, name)
 
 
@@ -209,7 +228,7 @@ class QiniuFile(File):
     def write(self, content):
         if 'w' not in self._mode:
             raise AttributeError("File was opened for read-only access.")
-        
+
         self.file.write(force_bytes(content))
         self._is_dirty = True
         self._is_read = True
