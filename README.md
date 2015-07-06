@@ -20,6 +20,9 @@ Django Qiniu Storage 需要以下几个配置才能正常工作。这些配置�
 | QINIU_SECRET_KEY                       | 七牛给开发者分配的 Secret            |
 | QINIU_BUCKET_NAME                      | 用来存放文件的七牛空间(bucket)的名字 |
 | QINIU_BUCKET_DOMAIN                    | 七牛空间(bucket)的域名               |
+| QINIU_HTTPS_DOMAIN                     | 通过 SSL 的形式来访问七牛云存储上的资源 |
+
+HTTPS域名配置的详情， 可以参考七牛官方文档 [如何通过 SSL 的形式来访问七牛云存储上的资源](http://kb.qiniu.com/https-support)
 
 ## Usage
 
@@ -32,7 +35,7 @@ Django Qiniu Storage 需要以下几个配置才能正常工作。这些配置�
     DEFAULT_FILE_STORAGE = 'qiniustorage.backends.QiniuStorage'
 
 #### 用例2： 用七牛托管动态生成的文件以及站点自身的静态文件
-首先，检查你的 `INSTALLED_APPS` setting， 确保安装了 `django.contrib.staticfiles` 这个 app。 
+首先，检查你的 `INSTALLED_APPS` setting， 确保安装了 `django.contrib.staticfiles` 这个 app。
 
 `staticfiles`  提供了一个名为 `collectstatic` 的命令。 它会收集各个 app 的根目录下的 `static` 子目录下的文件， 并汇总到一个地方。如果将 django settings 里的 `STATICFILES_STORAGE` 设置为  `QiniuStorage`， 收集到的静态文件就会被统一上传到七牛。
 

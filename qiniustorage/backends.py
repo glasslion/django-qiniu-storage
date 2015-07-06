@@ -18,18 +18,18 @@ from django.conf import settings
 from django.core.files.base import File
 from django.core.files.storage import Storage
 from django.core.exceptions import ImproperlyConfigured, SuspiciousOperation
-from django.utils.encoding import force_text, force_bytes
+from django.utils.encoding import force_text, force_bytes, filepath_to_uri
 
 from .utils import QiniuError, bucket_lister
 
 
-def get_qiniu_config(name):
+def get_qiniu_config(name, default=None):
     """
     Get configuration variable from environment variable
     or django setting.py
     """
-    config = os.environ.get(name, getattr(settings, name, None))
-    if config:
+    config = os.environ.get(name, getattr(settings, name, default))
+    if config is not None:
         return config
     else:
         raise ImproperlyConfigured(
@@ -40,7 +40,8 @@ def get_qiniu_config(name):
 QINIU_ACCESS_KEY = get_qiniu_config('QINIU_ACCESS_KEY')
 QINIU_SECRET_KEY = get_qiniu_config('QINIU_SECRET_KEY')
 QINIU_BUCKET_NAME = get_qiniu_config('QINIU_BUCKET_NAME')
-QINIU_BUCKET_DOMAIN = get_qiniu_config('QINIU_BUCKET_DOMAIN')
+QINIU_BUCKET_DOMAIN = get_qiniu_config('QINIU_BUCKET_DOMAIN').rstrip('/')
+QINIU_HTTPS_DOMAIN = get_qiniu_config('QINIU_HTTPS_DOMAIN', '').rstrip('/')
 
 
 class QiniuStorage(Storage):
@@ -176,7 +177,11 @@ class QiniuStorage(Storage):
 
     def url(self, name):
         name = self._normalize_name(self._clean_name(name))
-        return urljoin("http://" + self.bucket_domain, name)
+        name = filepath_to_uri(name)
+        if QINIU_HTTPS_DOMAIN != '':
+            return urljoin('https://' + QINIU_HTTPS_DOMAIN, name)
+        else:
+            return urljoin('http://' + self.bucket_domain, name)
 
 
 class QiniuMediaStorage(QiniuStorage):
