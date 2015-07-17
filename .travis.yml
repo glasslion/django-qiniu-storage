@@ -1,24 +1,31 @@
 language: python
+
 python:
 - '2.7'
 - '2.6'
 - '3.3'
 - '3.4'
+
 install:
 - pip install -r requirements.txt
 - pip install django==$DJANGO_VERSION
 - pip install -e .
+
 script: py.test
+
+env:
   matrix:
   - DJANGO_VERSION=1.8
   - DJANGO_VERSION=1.7
   - DJANGO_VERSION=1.6
   - DJANGO_VERSION=1.5
+
   global:
   - USING_TRAVIS=YES
   - QINIU_BUCKET_NAME=django-qiniu-storage
   - QINIU_BUCKET_DOMAIN=django-qiniu-storage.qiniudn.com
   - secure: QVYe9vITrCQw924X7h0vYfHwSDGs6QTaHitM2M31hVkYdBWnYMQZcyW1b5DUcXIOot/Z9+1av77tHgh2nXPA34uR7OIzO+LTtmByEE4fOQwJPDkWvJmF63z6B3eRwH20RPg7sBhzQqEK8KPApTiVjRxw5qsf8yp3+V5aozrKAOg=
+
 matrix:
   exclude:
   - python: '2.6'
