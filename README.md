@@ -1,8 +1,6 @@
 # Django Qiniu Storage
 
 [![Build Status](https://travis-ci.org/glasslion/django-qiniu-storage.svg?branch=master)](https://travis-ci.org/glasslion/django-qiniu-storage)
-[![Latest Version](https://pypip.in/version/django-qiniu-storage/badge.svg)](https://pypi.python.org/pypi/django-qiniu-storage/)
-[![License](https://pypip.in/license/django-qiniu-storage/badge.svg)](https://pypi.python.org/pypi/django-qiniu-storage/)
 
 ### Django storage for [七牛云存储](http://www.qiniu.com/)
 
