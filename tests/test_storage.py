@@ -2,7 +2,8 @@
 from __future__ import absolute_import, unicode_literals, print_function
 from datetime import datetime
 import os
-from os.path import dirname,join
+from os.path import dirname, join
+import sys
 import unittest
 import uuid
 
@@ -10,11 +11,19 @@ import django
 import pytest
 
 from qiniu import set_default, BucketManager
+from qiniu.config import Zone
+
+zone_overseas = Zone('up.qiniug.com', 'upload.qiniug.com')
+
 
 
 from .utils import retry
 
-os.environ.setdefault("DJANGO_SETTINGS_MODULE", "demo-project.settings")
+
+# Add repo/demo_site to sys.path
+DEMO_SITE_DIR = join(dirname(dirname(__file__)), 'demo_site')
+sys.path.append(DEMO_SITE_DIR)
+os.environ.setdefault("DJANGO_SETTINGS_MODULE", "demo_site.settings")
 
 try:
     django.setup()
@@ -28,7 +37,7 @@ from qiniustorage.utils import QiniuError
 
 USING_TRAVIS = os.environ.get('USING_TRAVIS', None) is None
 if USING_TRAVIS:
-    set_default(default_up_host='up.qiniug.com', connection_timeout=100, connection_retries=20)
+    set_default(default_zone=zone_overseas, connection_retries=20, connection_timeout=100)
 
 UNIQUE_PATH = str(uuid.uuid4())
 
@@ -59,10 +68,10 @@ class QiniuStorageTest(unittest.TestCase):
 
             assset_file.seek(0, os.SEEK_END)
             assset_file_size = assset_file.tell()
-            
+
             fil.write(content)
             self.storage._save(REMOTE_PATH, fil)
-            
+
             assert self.storage.exists(REMOTE_PATH)
 
         assert self.storage.size(REMOTE_PATH) == assset_file_size
@@ -133,7 +142,7 @@ class QiniuStorageTest(unittest.TestCase):
         assert dirs == []
         assert sorted(files) == sorted(filenames)
 
-   
+
     @classmethod
     def teardown_class(cls):
         """Delete all files in the test bucket.
