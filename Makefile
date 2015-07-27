@@ -50,15 +50,15 @@ coverage:
 docs:
 	rm -f docs/qiniustorage .rst
 	rm -f docs/modules.rst
-	sphinx-apidoc -o docs/ qiniustorage 
+	sphinx-apidoc -o docs/ qiniustorage
 	$(MAKE) -C docs clean
 	$(MAKE) -C docs html
 	open docs/_build/html/index.html
 
 release: clean
 	pandoc --from=markdown_github --to=rst --output=DESCRIPTION.rst README.md
-	python setup.py sdist upload
-	python setup.py bdist_wheel upload
+	python setup.py sdist bdist_wheel
+	twine upload dist/*
 
 dist: clean
 	pandoc --from=markdown_github --to=rst --output=DESCRIPTION.rst README.md
