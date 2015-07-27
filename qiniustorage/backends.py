@@ -142,7 +142,6 @@ class QiniuStorage(Storage):
     def _file_stat(self, name, silent=False):
         name = self._normalize_name(self._clean_name(name))
 
-        name = name.encode('utf-8')
         ret, info = self.bucket_manager.stat(self.bucket_name, name)
         if ret is None and not silent:
             raise QiniuError(info)
