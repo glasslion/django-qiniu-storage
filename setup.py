@@ -27,8 +27,13 @@ def find_version(*file_paths):
 
 
 # Get the long description from the relevant file
-with codecs.open('DESCRIPTION.rst', encoding='utf-8') as f:
-    long_description = f.read()
+try:
+    with codecs.open('DESCRIPTION.rst', encoding='utf-8') as f:
+        long_description = f.read()
+except IOError:
+    # When travis install the package from the github clone,
+    # it cant's find DESCRIPTION.rst
+    long_description = ""
 
 setup(
     name="django-qiniu-storage",
