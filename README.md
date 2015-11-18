@@ -24,7 +24,7 @@ Django Qiniu Storage 需要以下几个配置才能正常工作。这些配置�
 
 ## Usage
 
-如果你对 Django 的 Storage 系统尚不熟悉的话， Django 官方文档中的这几篇: [Managing files](https://docs.djangoproject.com/en/1.7/topics/files/), [Managing static files](https://docs.djangoproject.com/en/1.7/howto/static-files/), [The staticfiles app](https://docs.djangoproject.com/恩/1.7/ref/contrib/staticfiles/) 都是很不错的阅读材料。 建议阅读完后， 再看本教程。
+如果你对 Django 的 Storage 系统尚不熟悉的话， Django 官方文档中的这几篇: [Managing files](https://docs.djangoproject.com/en/1.7/topics/files/), [Managing static files](https://docs.djangoproject.com/en/1.7/howto/static-files/), [The staticfiles app](https://docs.djangoproject.com/en/1.7/ref/contrib/staticfiles/) 都是很不错的阅读材料。 建议阅读完后， 再看本教程。
 
 #### 用例1： 只用七牛托管动态生成的文件（例如用户上传的文件）
 
