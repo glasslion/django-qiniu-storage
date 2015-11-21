@@ -109,18 +109,12 @@ class QiniuStorage(Storage):
         cleaned_name = self._clean_name(name)
         name = self._normalize_name(cleaned_name)
 
-        if hasattr(content, 'open'):
-            # Since Django 1.6, content should be a instance
-            # of `django.core.files.File`
-            content.open()
-
         if hasattr(content, 'chunks'):
             content_str = b''.join(chunk for chunk in content.chunks())
         else:
             content_str = content.read()
 
         self._put_file(name, content_str)
-        content.close()
         return cleaned_name
 
     def _put_file(self, name, content):
