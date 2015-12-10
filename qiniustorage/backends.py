@@ -5,21 +5,16 @@ from __future__ import absolute_import, unicode_literals
 import datetime
 import os
 import posixpath
-
 from six import BytesIO
 from six.moves import cStringIO as StringIO
 from six.moves.urllib_parse import urljoin, urlparse
-
-
 from qiniu import Auth, BucketManager, put_data
 import requests
-
 from django.conf import settings
 from django.core.files.base import File
 from django.core.files.storage import Storage
 from django.core.exceptions import ImproperlyConfigured, SuspiciousOperation
 from django.utils.encoding import force_text, force_bytes, filepath_to_uri
-
 from .utils import QiniuError, bucket_lister
 
 
@@ -48,6 +43,7 @@ if QINIU_SECURE_URL.lower() in ('true', '1'):
 else:
     QINIU_SECURE_URL = False
 
+
 class QiniuStorage(Storage):
     """
     Qiniu Storage Service
@@ -69,19 +65,19 @@ class QiniuStorage(Storage):
         self.secure_url = secure_url
 
     def _clean_name(self, name):
-            """
-            Cleans the name so that Windows style paths work
-            """
-            # Normalize Windows style paths
-            clean_name = posixpath.normpath(name).replace('\\', '/')
+        """
+        Cleans the name so that Windows style paths work
+        """
+        # Normalize Windows style paths
+        clean_name = posixpath.normpath(name).replace('\\', '/')
 
-            # os.path.normpath() can strip trailing slashes so we implement
-            # a workaround here.
-            if name.endswith('/') and not clean_name.endswith('/'):
-                # Add a trailing slash as it was stripped.
-                return clean_name + '/'
-            else:
-                return clean_name
+        # os.path.normpath() can strip trailing slashes so we implement
+        # a workaround here.
+        if name.endswith('/') and not clean_name.endswith('/'):
+            # Add a trailing slash as it was stripped.
+            return clean_name + '/'
+        else:
+            return clean_name
 
     def _normalize_name(self, name):
         """
@@ -97,7 +93,7 @@ class QiniuStorage(Storage):
 
         base_path_len = len(base_path)
         if (not final_path.startswith(base_path) or
-                final_path[base_path_len:base_path_len + 1] not in ('', '/')):
+                    final_path[base_path_len:base_path_len + 1] not in ('', '/')):
             raise SuspiciousOperation("Attempted access to '%s' denied." %
                                       name)
         return final_path.lstrip('/')
@@ -157,7 +153,7 @@ class QiniuStorage(Storage):
 
     def modified_time(self, name):
         stats = self._file_stat(name)
-        time_stamp = float(stats['putTime'])/10000000
+        time_stamp = float(stats['putTime']) / 10000000
         return datetime.datetime.fromtimestamp(time_stamp)
 
     def listdir(self, name):
@@ -198,7 +194,9 @@ class QiniuStaticStorage(QiniuStorage):
 class QiniuFile(File):
     def __init__(self, name, storage, mode):
         self._storage = storage
-        self._name = name[len(self._storage.location):].lstrip('/')
+        if name.startswith(self._storage.location):
+            name = name[len(self._storage.location):]
+        self._name = name.lstrip('/')
         self._mode = mode
         self.file = BytesIO()
         self._is_dirty = False
@@ -232,7 +230,6 @@ class QiniuFile(File):
             return data
         else:
             return force_text(data)
-
 
     def write(self, content):
         if 'w' not in self._mode:
