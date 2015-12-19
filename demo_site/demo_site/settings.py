@@ -173,3 +173,5 @@ ADMIN_PASSWORD = 'admin'
 
 DEFAULT_FILE_STORAGE = 'qiniustorage.backends.QiniuMediaStorage'
 STATICFILES_STORAGE = 'qiniustorage.backends.QiniuStaticStorage'
+
+QINIU_SECURE_URL = False

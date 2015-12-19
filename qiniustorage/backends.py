@@ -6,7 +6,7 @@ import datetime
 import os
 import posixpath
 
-from six import BytesIO
+from six import BytesIO, string_types
 from six.moves import cStringIO as StringIO
 from six.moves.urllib_parse import urljoin, urlparse
 
@@ -30,7 +30,10 @@ def get_qiniu_config(name, default=None):
     """
     config = os.environ.get(name, getattr(settings, name, default))
     if config is not None:
-        return config.strip()
+        if isinstance(config, string_types):
+            return config.strip()
+        else:
+            return config
     else:
         raise ImproperlyConfigured(
             "Can't find config for '%s' either in environment"
@@ -43,10 +46,13 @@ QINIU_BUCKET_NAME = get_qiniu_config('QINIU_BUCKET_NAME')
 QINIU_BUCKET_DOMAIN = get_qiniu_config('QINIU_BUCKET_DOMAIN', '').rstrip('/')
 QINIU_SECURE_URL = get_qiniu_config('QINIU_SECURE_URL', 'False')
 
-if QINIU_SECURE_URL.lower() in ('true', '1'):
-    QINIU_SECURE_URL = True
-else:
-    QINIU_SECURE_URL = False
+
+if isinstance(QINIU_SECURE_URL, string_types):
+    if QINIU_SECURE_URL.lower() in ('true', '1'):
+        QINIU_SECURE_URL = True
+    else:
+        QINIU_SECURE_URL = False
+
 
 class QiniuStorage(Storage):
     """
