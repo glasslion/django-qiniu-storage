@@ -10,7 +10,6 @@ from six import BytesIO, string_types
 from six.moves import cStringIO as StringIO
 from six.moves.urllib_parse import urljoin, urlparse
 
-
 from qiniu import Auth, BucketManager, put_data
 import requests
 
@@ -75,23 +74,23 @@ class QiniuStorage(Storage):
         self.secure_url = secure_url
 
     def _clean_name(self, name):
-            """
-            Cleans the name so that Windows style paths work
-            """
-            # Normalize Windows style paths
-            clean_name = posixpath.normpath(name).replace('\\', '/')
+        """
+        Cleans the name so that Windows style paths work
+        """
+        # Normalize Windows style paths
+        clean_name = posixpath.normpath(name).replace('\\', '/')
 
-            # os.path.normpath() can strip trailing slashes so we implement
-            # a workaround here.
-            if name.endswith('/') and not clean_name.endswith('/'):
-                # Add a trailing slash as it was stripped.
-                return clean_name + '/'
-            else:
-                return clean_name
+        # os.path.normpath() can strip trailing slashes so we implement
+        # a workaround here.
+        if name.endswith('/') and not clean_name.endswith('/'):
+            # Add a trailing slash as it was stripped.
+            return clean_name + '/'
+        else:
+            return clean_name
 
     def _normalize_name(self, name):
         """
-        Normalizes the name so that paths like /path/to/ignored/../something.txt
+        Normalizes the name so that paths like /path/to/ignored/../foo.txt
         work. We check to make sure that the path pointed to is not outside
         the directory specified by the LOCATION setting.
         """
@@ -163,7 +162,7 @@ class QiniuStorage(Storage):
 
     def modified_time(self, name):
         stats = self._file_stat(name)
-        time_stamp = float(stats['putTime'])/10000000
+        time_stamp = float(stats['putTime']) / 10000000
         return datetime.datetime.fromtimestamp(time_stamp)
 
     def listdir(self, name):
@@ -171,7 +170,8 @@ class QiniuStorage(Storage):
         if name and not name.endswith('/'):
             name += '/'
 
-        dirlist = bucket_lister(self.bucket_manager, self.bucket_name, prefix=name)
+        dirlist = bucket_lister(self.bucket_manager, self.bucket_name,
+                                prefix=name)
         files = []
         dirs = set()
         base_parts = name.split("/")[:-1]
@@ -238,7 +238,6 @@ class QiniuFile(File):
             return data
         else:
             return force_text(data)
-
 
     def write(self, content):
         if 'w' not in self._mode:
