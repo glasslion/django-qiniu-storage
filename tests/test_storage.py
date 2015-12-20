@@ -86,7 +86,7 @@ class QiniuStorageTest(unittest.TestCase):
             # machine. Thus the absolute delta within 60s should be considered
             # acceptable.
             time_delta = max(now, modified_time) - min(now, modified_time)
-            assert time_delta.seconds < 60
+            assert time_delta.seconds < 180
 
             self.storage.delete(REMOTE_PATH)
             assert self.storage.exists(REMOTE_PATH) == False
