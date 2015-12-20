@@ -140,7 +140,6 @@ class QiniuStorageTest(unittest.TestCase):
 
     @retry(QiniuError, tries=10, backoff=1)
     def test_listdir(self):
-        raise QiniuError('retry test')
         dirnames = ['', 'foo', 'bar']
         filenames = ['file1', 'file2', 'file3', u'file四']
         for dirname in dirnames:
