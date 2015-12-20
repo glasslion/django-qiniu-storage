@@ -8,10 +8,14 @@ import time
 import unittest
 import uuid
 
+import logging
+logging.basicConfig(level=logging.WARNING)
+
 import six
 import django
 import pytest
 from requests.exceptions import ConnectionError
+
 
 from qiniu import set_default, BucketManager
 from qiniu.config import Zone
@@ -134,8 +138,9 @@ class QiniuStorageTest(unittest.TestCase):
         assert self.storage.exists(REMOTE_PATH) == True
 
 
-    @retry(QiniuError, tries=10)
+    @retry(QiniuError, tries=10, backoff=1)
     def test_listdir(self):
+        raise QiniuError('retry test')
         dirnames = ['', 'foo', 'bar']
         filenames = ['file1', 'file2', 'file3', u'file四']
         for dirname in dirnames:
