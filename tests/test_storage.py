@@ -132,7 +132,7 @@ class QiniuStorageTest(unittest.TestCase):
         assert self.storage.exists(REMOTE_PATH) == True
 
 
-    @retry(AssertionError, tries=10)
+    @retry(QiniuError, tries=10)
     def test_listdir(self):
         dirnames = ['', 'foo', 'bar']
         filenames = ['file1', 'file2', 'file3', u'file四']
