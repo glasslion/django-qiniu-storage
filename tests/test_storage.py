@@ -91,7 +91,6 @@ class QiniuStorageTest(unittest.TestCase):
             self.storage.delete(REMOTE_PATH)
             assert self.storage.exists(REMOTE_PATH) == False
 
-    @retry(ConnectionError, tries=10)
     def test_read_file(self):
         ASSET_FILE_NAMES =  [u'jquery-1.11.1.min.js', u'jquery-一点十一点壹.js']
         for assert_file_name in ASSET_FILE_NAMES:
