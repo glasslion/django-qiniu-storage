@@ -6,7 +6,7 @@ import datetime
 import os
 import posixpath
 
-from six import BytesIO, string_types
+import six
 from six.moves import cStringIO as StringIO
 from six.moves.urllib_parse import urljoin, urlparse
 
@@ -29,7 +29,7 @@ def get_qiniu_config(name, default=None):
     """
     config = os.environ.get(name, getattr(settings, name, default))
     if config is not None:
-        if isinstance(config, string_types):
+        if isinstance(config, six.string_types):
             return config.strip()
         else:
             return config
@@ -46,7 +46,7 @@ QINIU_BUCKET_DOMAIN = get_qiniu_config('QINIU_BUCKET_DOMAIN', '').rstrip('/')
 QINIU_SECURE_URL = get_qiniu_config('QINIU_SECURE_URL', 'False')
 
 
-if isinstance(QINIU_SECURE_URL, string_types):
+if isinstance(QINIU_SECURE_URL, six.string_types):
     if QINIU_SECURE_URL.lower() in ('true', '1'):
         QINIU_SECURE_URL = True
     else:
@@ -139,6 +139,8 @@ class QiniuStorage(Storage):
 
     def delete(self, name):
         name = self._normalize_name(self._clean_name(name))
+        if six.PY2:
+            name = name.encode('utf-8')
         ret, info = self.bucket_manager.delete(self.bucket_name, name)
 
         if ret is None or info.status_code == 612:
@@ -146,7 +148,8 @@ class QiniuStorage(Storage):
 
     def _file_stat(self, name, silent=False):
         name = self._normalize_name(self._clean_name(name))
-
+        if six.PY2:
+            name = name.encode('utf-8')
         ret, info = self.bucket_manager.stat(self.bucket_name, name)
         if ret is None and not silent:
             raise QiniuError(info)
@@ -206,7 +209,7 @@ class QiniuFile(File):
         self._storage = storage
         self._name = name[len(self._storage.location):].lstrip('/')
         self._mode = mode
-        self.file = BytesIO()
+        self.file = six.BytesIO()
         self._is_dirty = False
         self._is_read = False
 
@@ -226,7 +229,7 @@ class QiniuFile(File):
     def read(self, num_bytes=None):
         if not self._is_read:
             content = self._storage._read(self._name)
-            self.file = BytesIO(content)
+            self.file = six.BytesIO(content)
             self._is_read = True
 
         if num_bytes is None:

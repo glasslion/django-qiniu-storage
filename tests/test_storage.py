@@ -7,6 +7,7 @@ import sys
 import unittest
 import uuid
 
+import six
 import django
 import pytest
 
@@ -58,52 +59,57 @@ class QiniuStorageTest(unittest.TestCase):
             fil.write("goto fail")
 
     def test_write_and_delete_file(self):
-        ASSET_FILE_NAME = 'jquery-1.11.1.min.js'
-        REMOTE_PATH = join(UNIQUE_PATH, ASSET_FILE_NAME)
-        assert self.storage.exists(REMOTE_PATH) == False
-        fil = QiniuFile(REMOTE_PATH, self.storage, mode='wb')
+        ASSET_FILE_NAMES = [u'jquery-2.1.1.min.js', u'jquery-2点壹点一.min.js']
+        for assert_file_name in ASSET_FILE_NAMES:
+            REMOTE_PATH = join(UNIQUE_PATH, assert_file_name)
+            assert self.storage.exists(REMOTE_PATH) == False
+            fil = QiniuFile(REMOTE_PATH, self.storage, mode='wb')
 
-        with open(join(dirname(__file__),'assets', ASSET_FILE_NAME), 'rb') as assset_file:
-            content = assset_file.read()
+            with open(join(dirname(__file__),'assets', assert_file_name), 'rb') as assset_file:
+                content = assset_file.read()
 
-            assset_file.seek(0, os.SEEK_END)
-            assset_file_size = assset_file.tell()
+                assset_file.seek(0, os.SEEK_END)
+                assset_file_size = assset_file.tell()
 
-            fil.write(content)
-            self.storage._save(REMOTE_PATH, fil)
+                fil.write(content)
+                self.storage._save(REMOTE_PATH, fil)
 
-            assert self.storage.exists(REMOTE_PATH)
+                assert self.storage.exists(REMOTE_PATH)
 
-        assert self.storage.size(REMOTE_PATH) == assset_file_size
+            assert self.storage.size(REMOTE_PATH) == assset_file_size
 
-        time_delta = datetime.now() - self.storage.modified_time(REMOTE_PATH)
-        assert time_delta.seconds < 60
+            now = datetime.utcnow()
+            modified_time = self.storage.modified_time(REMOTE_PATH)
+            # Datetime on Qiniu servers may be faster or slower than the local
+            # machine. Thus the absolute delta within 60s should be considered
+            # acceptable.
+            time_delta = max(now, modified_time) - min(now, modified_time)
+            assert time_delta.total_seconds() < 60
 
-        self.storage.delete(REMOTE_PATH)
-        assert self.storage.exists(REMOTE_PATH) == False
+            self.storage.delete(REMOTE_PATH)
+            assert self.storage.exists(REMOTE_PATH) == False
 
     def test_read_file(self):
-        ASSET_FILE_NAME = 'jquery-2.1.1.min.js'
-        REMOTE_PATH = join(UNIQUE_PATH, ASSET_FILE_NAME)
+        ASSET_FILE_NAMES =  [u'jquery-1.11.1.min.js', u'jquery-一点十一点壹.js']
+        for assert_file_name in ASSET_FILE_NAMES:
+            REMOTE_PATH = join(UNIQUE_PATH, assert_file_name)
 
-        with open(join(dirname(__file__),'assets', ASSET_FILE_NAME), 'rb') as assset_file:
-            self.storage.save(REMOTE_PATH, assset_file)
+            with open(join(dirname(__file__),'assets', assert_file_name), 'rb') as assset_file:
+                self.storage.save(REMOTE_PATH, assset_file)
 
-        fil = self.storage.open(REMOTE_PATH, 'r')
+            fil = self.storage.open(REMOTE_PATH, 'r')
 
-        assert fil._is_read == False
+            assert fil._is_read == False
 
-        content = fil.read()
-        assert content.startswith(u"/*!")
+            content = fil.read()
+            assert content.startswith(u"/*!")
 
-        assert fil._is_read == True
+            assert fil._is_read == True
 
-        # Test open mode
-        fil = self.storage.open(REMOTE_PATH, 'rb')
-        bin_content = fil.read()
-        assert bin_content.startswith(b"/*!")
-
-
+            # Test open mode
+            fil = self.storage.open(REMOTE_PATH, 'rb')
+            bin_content = fil.read()
+            assert bin_content.startswith(b"/*!")
 
     def test_dirty_file(self):
         ASSET_FILE_NAME = 'bootstrap.min.css'
@@ -125,10 +131,11 @@ class QiniuStorageTest(unittest.TestCase):
         fil.close()
         assert self.storage.exists(REMOTE_PATH) == True
 
+
     @retry(AssertionError, tries=10)
     def test_listdir(self):
         dirnames = ['', 'foo', 'bar']
-        filenames = ['file1', 'file2', 'file3']
+        filenames = ['file1', 'file2', 'file3', u'file四']
         for dirname in dirnames:
             for filename in filenames:
                 fil = self.storage.open(join(UNIQUE_PATH, dirname, filename), 'w')
@@ -160,7 +167,8 @@ class QiniuStorageTest(unittest.TestCase):
 
             for item in ret['items']:
                 name = item['key']
-                print("Deleting %s ..." % name)
+                if six.PY2:
+                    name = name.encode('utf-8')
                 ret, info = bucket.delete(storage.bucket_name, name)
                 if ret is None:
                     print(info)
