@@ -4,6 +4,7 @@ from datetime import datetime
 import os
 from os.path import dirname, join
 import sys
+import time
 import unittest
 import uuid
 
@@ -143,6 +144,7 @@ class QiniuStorageTest(unittest.TestCase):
                 fil = self.storage.open(join(UNIQUE_PATH, dirname, filename), 'w')
                 fil.write('test text')
                 fil.close()
+        time.sleep(3)
 
         dirs, files = self.storage.listdir(UNIQUE_PATH)
         assert sorted(dirs) == sorted(['foo', 'bar'])
