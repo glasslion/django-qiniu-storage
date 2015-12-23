@@ -26,16 +26,18 @@ Django Qiniu Storage 需要以下几个配置才能正常工作。这些配置�
 
 如果你对 Django 的 Storage 系统尚不熟悉的话， Django 官方文档中的这几篇: [Managing files](https://docs.djangoproject.com/en/1.7/topics/files/), [Managing static files](https://docs.djangoproject.com/en/1.7/howto/static-files/), [The staticfiles app](https://docs.djangoproject.com/en/1.7/ref/contrib/staticfiles/) 都是很不错的阅读材料。 建议阅读完后， 再看本教程。
 
+Django Storage System 的应用场景主要有两种： 存放网站用户上传的文件和存放网站自身的js, css, 图片等静态文件：
+
 #### 用例1： 只用七牛托管动态生成的文件（例如用户上传的文件）
 
 在 settings.py 里设置 `DEFAULT_FILE_STORAGE` :
 
     DEFAULT_FILE_STORAGE = 'qiniustorage.backends.QiniuStorage'
 
-#### 用例2： 用七牛托管动态生成的文件以及站点自身的静态文件
+#### 用例2： 用七牛托管动态生成的文件以及站点自身的静态文件（相当于 CDN）
 首先，检查你的 `INSTALLED_APPS` setting， 确保安装了 `django.contrib.staticfiles` 这个 app。
 
-`staticfiles`  提供了一个名为 `collectstatic` 的命令。 它会收集各个 app 的根目录下的 `static` 子目录下的文件， 并汇总到一个地方。如果将 django settings 里的 `STATICFILES_STORAGE` 设置为  `QiniuStorage`， 收集到的静态文件就会被统一上传到七牛。
+`staticfiles`  提供了一个名为 `collectstatic` 的命令。 它会收集各个 app 的根目录下的 `static` 子目录下的文件， 并汇总到一个地方。如果将 django settings 里的 `STATICFILES_STORAGE` 设置为  `QiniuStorage`，`collectstatic` 收集到的静态文件就会被统一上传到七牛。
 
 
 
