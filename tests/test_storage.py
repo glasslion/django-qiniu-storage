@@ -9,7 +9,9 @@ import unittest
 import uuid
 
 import logging
-logging.basicConfig(level=logging.WARNING)
+LOGGING_FORMAT = '\n%(asctime)-15s %(message)s'
+logging.basicConfig(level=logging.INFO, format=LOGGING_FORMAT)
+logger = logging.getLogger(__name__)
 
 import six
 import django
@@ -138,7 +140,7 @@ class QiniuStorageTest(unittest.TestCase):
         assert self.storage.exists(REMOTE_PATH) == True
 
 
-    @retry(QiniuError, tries=10, backoff=1)
+    @retry(QiniuError, tries=10, backoff=1, logger=logger)
     def test_listdir(self):
         dirnames = ['', 'foo', 'bar']
         filenames = ['file1', 'file2', 'file3', u'file四']
