@@ -10,7 +10,7 @@ install:
 - pip install django==$DJANGO_VERSION
 - pip install -e .
 
-script: py.test
+script: py.test --verbose
 
 env:
   matrix:
