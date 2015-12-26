@@ -203,6 +203,10 @@ class QiniuMediaStorage(QiniuStorage):
 class QiniuStaticStorage(QiniuStorage):
     location = 'static'
 
+class QiniuPrivateStorage(QiniuStorage):
+    def url(self, name):
+        raw_url = super(QiniuPrivateStorage, self).url(name)
+        return force_text(self.auth.private_download_url(raw_url))
 
 class QiniuFile(File):
     def __init__(self, name, storage, mode):
