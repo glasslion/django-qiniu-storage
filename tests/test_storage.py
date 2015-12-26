@@ -45,8 +45,6 @@ from qiniustorage.backends import QiniuStorage, QiniuFile
 from qiniustorage.utils import QiniuError
 
 USING_TRAVIS = os.environ.get('USING_TRAVIS', None) is None
-if USING_TRAVIS:
-    set_default(default_zone=zone_overseas, connection_retries=20, connection_timeout=100)
 
 UNIQUE_PATH = str(uuid.uuid4())
 
