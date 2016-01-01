@@ -18,15 +18,18 @@ Django Qiniu Storage 需要以下几个配置才能正常工作。这些配置�
 | QINIU_SECRET_KEY                       | 七牛给开发者分配的 Secret            |
 | QINIU_BUCKET_NAME                      | 用来存放文件的七牛空间(bucket)的名字 |
 | QINIU_BUCKET_DOMAIN                    | 七牛空间(bucket)的域名               |
-| QINIU_SECURE_URL                       | 是否通过 HTTPS 来访问七牛云存储上的资源(若为'是', 可填True, true 或 1；若为'否', 可填False, false 或 0) |
+| QINIU_SECURE_URL                       | 是否通过 HTTPS 来访问七牛云存储上的资源(若为'是', 可填True, true 或 1；若为'否', 可填False, false 或 0) 默认为否。|
 
 关于 HTTPS域名配置的详情， 可以参考七牛官方文档 [如何通过 SSL 的形式来访问七牛云存储上的资源](http://kb.qiniu.com/https-support)
 
 ## Usage
 
-如果你对 Django 的 Storage 系统尚不熟悉的话， Django 官方文档中的这几篇: [Managing files](https://docs.djangoproject.com/en/1.7/topics/files/), [Managing static files](https://docs.djangoproject.com/en/1.7/howto/static-files/), [The staticfiles app](https://docs.djangoproject.com/en/1.7/ref/contrib/staticfiles/) 都是很不错的阅读材料。 建议阅读完后， 再看本教程。
+### Django Storage 101
+Django Storage System 是 Django 框架对文件存储做的一层抽象。由于不同的 storage system 使用同样的文件读写接口， Django 应用可以轻松地将其文件存储载体替换为本地文件系统, AWS S3, Openstack, Azue, Mongodb 或七牛云存储 ， 而无需改动应用代码。
 
-Django Storage System 的应用场景主要有两种： 存放网站用户上传的文件和存放网站自身的js, css, 图片等静态文件：
+如果你对 Django 的 Storage 系统尚不熟悉的话， Django 官方文档中的这几篇: [Managing files](https://docs.djangoproject.com/en/1.7/topics/files/), [Managing static files](https://docs.djangoproject.com/en/1.7/howto/static-files/), [The staticfiles app](https://docs.djangoproject.com/en/1.7/ref/contrib/staticfiles/) 都是很不错的阅读材料。 建议阅读完后，了解一些概念和配置项的含义后，再来看本教程。
+
+Django Storage System 的应用场景主要有两种： 存放网站用户上传的文件和存放网站自身的js, css, 图片等静态文件。
 
 #### 用例1： 只用七牛托管动态生成的文件（例如用户上传的文件）
 
