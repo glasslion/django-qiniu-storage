@@ -5,6 +5,7 @@ from __future__ import absolute_import, unicode_literals
 import datetime
 import os
 import posixpath
+import warnings
 
 import six
 from six.moves import cStringIO as StringIO
@@ -192,21 +193,30 @@ class QiniuStorage(Storage):
     def url(self, name):
         name = self._normalize_name(self._clean_name(name))
         name = filepath_to_uri(name)
-        protocol = 'https://' if self.secure_url else 'http://'
+        protocol = u'https://' if self.secure_url else u'http://'
         return urljoin(protocol + self.bucket_domain, name)
 
 
 class QiniuMediaStorage(QiniuStorage):
-    location = 'media'
+    def __init__(self, *args, **kwargs):
+        warnings.warn(
+            "QiniuMediaStorage is deprecated, and will be removed in the future."
+            "User uploads handled by QiniuMediaStorage are public and can be accessed without any checks."
+            "For general use, please choose QiniuPrivateStorage instead."
+            , DeprecationWarning)
+        super(QiniuMediaStorage, self).__init__(*args, **kwargs)
+    location = settings.MEDIA_ROOT
 
 
-class QiniuStaticStorage(QiniuStorage):
-    location = 'static'
+class QiniuStaticStorage(QiniuMediaStorage):
+    location = settings.STATIC_ROOT or "static"
+
 
 class QiniuPrivateStorage(QiniuStorage):
     def url(self, name):
         raw_url = super(QiniuPrivateStorage, self).url(name)
         return force_text(self.auth.private_download_url(raw_url))
+
 
 class QiniuFile(File):
     def __init__(self, name, storage, mode):
