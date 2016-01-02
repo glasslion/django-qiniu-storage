@@ -23,6 +23,8 @@ env:
   - USING_TRAVIS=YES
   - QINIU_BUCKET_NAME=django-qiniu-storage
   - QINIU_BUCKET_DOMAIN=django-qiniu-storage.qiniudn.com
+  - QINIU_PRIVATE_BUCKET_NAME="django-qiniu-private-storage"
+  - QINIU_PRIVATE_BUCKET_DOMAIN="7xplxq.com1.z0.glb.clouddn.com"
   - secure: QVYe9vITrCQw924X7h0vYfHwSDGs6QTaHitM2M31hVkYdBWnYMQZcyW1b5DUcXIOot/Z9+1av77tHgh2nXPA34uR7OIzO+LTtmByEE4fOQwJPDkWvJmF63z6B3eRwH20RPg7sBhzQqEK8KPApTiVjRxw5qsf8yp3+V5aozrKAOg=
 
 matrix:
