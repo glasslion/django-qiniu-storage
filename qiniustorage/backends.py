@@ -208,7 +208,7 @@ class QiniuMediaStorage(QiniuStorage):
     location = settings.MEDIA_ROOT
 
 
-class QiniuStaticStorage(QiniuMediaStorage):
+class QiniuStaticStorage(QiniuStorage):
     location = settings.STATIC_ROOT or "static"
 
 
