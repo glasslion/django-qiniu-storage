@@ -44,6 +44,7 @@ QINIU_SECRET_KEY = get_qiniu_config('QINIU_SECRET_KEY')
 QINIU_BUCKET_NAME = get_qiniu_config('QINIU_BUCKET_NAME')
 QINIU_BUCKET_DOMAIN = get_qiniu_config('QINIU_BUCKET_DOMAIN', '').rstrip('/')
 QINIU_SECURE_URL = get_qiniu_config('QINIU_SECURE_URL', 'False')
+QINIU_STATIC_VERSION = get_qiniu_config('QINIU_STATIC_VERSION', 'False')
 
 
 if isinstance(QINIU_SECURE_URL, six.string_types):
@@ -202,6 +203,14 @@ class QiniuMediaStorage(QiniuStorage):
 
 class QiniuStaticStorage(QiniuStorage):
     location = 'static'
+
+    def url(self, name):
+        url = super(QiniuStaticStorage, self).url(name)
+        if not url.endswith("/") and "False" != str(QINIU_STATIC_VERSION):
+            if "?" not in url:
+                return "{!s}?_v={!s}".format(url, QINIU_STATIC_VERSION)
+            else:
+                return "{!s}&_v={!s}".format(url, QINIU_STATIC_VERSION)
 
 
 class QiniuFile(File):

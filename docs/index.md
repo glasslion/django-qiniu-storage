@@ -23,7 +23,11 @@ Django Qiniu Storage 需要以下几个配置才能正常工作。这些配置�
 用来存放文件的七牛空间(bucket)的名字
 
     QINIU_BUCKET_DOMAIN
-    
+
+用来强制刷新刷新客户端static缓存
+
+    QINIU_STATIC_VERSION
+
 七牛空间(bucket)的域名
 
 ## Usage
@@ -58,6 +62,7 @@ It's hosted on the [Read The Doc](http://django-qiniu-storage.readthedocs.org/zh
     export QINIU_SECRET_KEY=YOUR KEY
     export QINIU_BUCKET_DOMAIN=YOUR BUCKET DOMAIN
     export QINIU_BUCKET_NAME=YOUR BUCKET NAME
+    export QINIU_STATIC_VERSION=YOUR STATIC FILE VERSION
 
     python manage.py python manage.py collectstatic
 
