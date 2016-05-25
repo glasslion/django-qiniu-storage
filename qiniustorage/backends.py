@@ -4,6 +4,7 @@ Qiniu Storage Backends
 from __future__ import absolute_import, unicode_literals
 import datetime
 import os
+import hashlib
 import posixpath
 import warnings
 
@@ -43,7 +44,7 @@ def get_qiniu_config(name, default=None):
 QINIU_ACCESS_KEY = get_qiniu_config('QINIU_ACCESS_KEY')
 QINIU_SECRET_KEY = get_qiniu_config('QINIU_SECRET_KEY')
 QINIU_BUCKET_NAME = get_qiniu_config('QINIU_BUCKET_NAME')
-QINIU_BUCKET_DOMAIN = get_qiniu_config('QINIU_BUCKET_DOMAIN', '').rstrip('/')
+QINIU_BUCKET_DOMAINS = get_qiniu_config('QINIU_BUCKET_DOMAINS', '')
 QINIU_SECURE_URL = get_qiniu_config('QINIU_SECURE_URL', 'False')
 
 
@@ -65,12 +66,12 @@ class QiniuStorage(Storage):
             access_key=QINIU_ACCESS_KEY,
             secret_key=QINIU_SECRET_KEY,
             bucket_name=QINIU_BUCKET_NAME,
-            bucket_domain=QINIU_BUCKET_DOMAIN,
+            bucket_domains=QINIU_BUCKET_DOMAINS,
             secure_url=QINIU_SECURE_URL):
 
         self.auth = Auth(access_key, secret_key)
         self.bucket_name = bucket_name
-        self.bucket_domain = bucket_domain
+        self.bucket_domains = bucket_domains.split(',')
         self.bucket_manager = BucketManager(self.auth)
         self.secure_url = secure_url
 
@@ -190,11 +191,18 @@ class QiniuStorage(Storage):
                 dirs.add(parts[0])
         return list(dirs), files
 
+    def get_uri_domain(self, name):
+        num = len(self.bucket_domains)
+        if num == 0:
+            return ''
+        return self.bucket_domains[int(hashlib.md5(name).hexdigest(), 16) % num]
+
     def url(self, name):
         name = self._normalize_name(self._clean_name(name))
         name = filepath_to_uri(name)
+        domain = self.get_uri_domain(name)
         protocol = u'https://' if self.secure_url else u'http://'
-        return urljoin(protocol + self.bucket_domain, name)
+        return urljoin(protocol + domain, name)
 
 
 class QiniuMediaStorage(QiniuStorage):
