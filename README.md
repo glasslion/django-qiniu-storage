@@ -4,11 +4,11 @@
 
 ### Django storage for [七牛云存储](http://www.qiniu.com/)
 
-## Install
+## 安装
 
     pip install django-qiniu-storage
 
-## Configurations
+## 配置
 
 Django Qiniu Storage 需要以下几个配置才能正常工作。这些配置通过可以环境变量或 settings.py 来设置。环境变量的优先级要高于 settings.py 。
 
@@ -22,14 +22,15 @@ Django Qiniu Storage 需要以下几个配置才能正常工作。这些配置�
 
 关于 HTTPS域名配置的详情， 可以参考七牛官方文档 [如何通过 SSL 的形式来访问七牛云存储上的资源](http://kb.qiniu.com/https-support)
 
-## Usage
+## 使用指南
 
-### Django Storage 101
-Django Storage System 是 Django 框架对文件存储做的一层抽象。由于不同的 storage system 使用同样的文件读写接口， Django 应用可以轻松地将其文件存储载体替换为本地文件系统, AWS S3, Openstack, Azue, Mongodb 或七牛云存储 ， 而无需改动应用代码。
+### Django Storage 入门
+Django Storage System 是 Django 框架对文件存储系统做的一层抽象。由于不同的 storage system 使用同样的文件读写接口， Django 应用可以轻松地将其文件存储载体替换为本地文件系统, AWS S3, Openstack, Azue, Mongodb 或七牛云存储 ， 而无需改动应用代码。
 
-如果你对 Django 的 Storage 系统尚不熟悉的话， Django 官方文档中的这几篇: [Managing files](https://docs.djangoproject.com/en/1.7/topics/files/), [Managing static files](https://docs.djangoproject.com/en/1.7/howto/static-files/), [The staticfiles app](https://docs.djangoproject.com/en/1.7/ref/contrib/staticfiles/) 都是很不错的阅读材料。 建议阅读完后，了解一些概念和配置项的含义后，再来看本教程。
+如果你对 Django 的 Storage 系统尚不熟悉的话， Django 官方文档中的这几篇: [Managing files](https://docs.djangoproject.com/en/1.7/topics/files/), [Managing static files](https://docs.djangoproject.com/en/1.7/howto/static-files/), [The staticfiles app](https://docs.djangoproject.com/en/1.7/ref/contrib/staticfiles/) 都是很不错的阅读材料。 建议阅读完后，了解一些基本的概念和配置项的含义后，再来看本教程接下来的内容。
 
-Django Storage System 的应用场景主要有两种： 存放网站用户上传的文件和存放网站自身的js, css, 图片等静态文件。
+Django 和 storage 相关的 [settings](https://docs.djangoproject.com/en/dev/ref/settings/) 有两项: `STATICFILES_STORAGE`  和 `DEFAULT_FILE_STORAGE` 分别对应*网站自身的js, css, 图片等静态资源* 和*用户上传的文件*.
+
 
 #### 用例1： 只用七牛托管动态生成的文件（例如用户上传的文件）
 
@@ -50,6 +51,7 @@ It's hosted on the [Read The Doc](http://django-qiniu-storage.readthedocs.org/zh
 ).
 
 ## Changelog
+
 - 2.0.0 使用 7.x 版本的 Python SDK。同时支持 Python 2 和 Python 3， 但也因此不再支持 Django 1.4。
 - 新建 ”1.x“ 分支。 今后主分支将使用 7.x 版本的 Python SDK。2.x 会同时支持 Python 2 和 Python 3。
 - 1.2.0 主要是测试方面的改进。利用 Travic CI 对 (Python 2.6, 2.7)×( Django 1.4 -1.7) 的每个组合都跑一遍单元测试。
