@@ -2,6 +2,7 @@
 from __future__ import absolute_import, unicode_literals, print_function
 from datetime import datetime
 import os
+import re
 from os.path import dirname, join
 import sys
 import time
@@ -15,6 +16,7 @@ logger = logging.getLogger(__name__)
 
 import six
 import django
+import requests
 from requests.exceptions import ConnectionError
 
 from qiniu import BucketManager
@@ -72,6 +74,26 @@ class QiniuStorageTest(unittest.TestCase):
             fil = self.storage.open(REMOTE_PATH, 'rb')
             bin_content = fil.read()
             assert bin_content.startswith(u"你好".encode('utf-8'))
+
+    def test_private_url(self):
+        EXPIRES_RE = re.compile('e=(\d+)')
+        ASSET_FILE_NAMES =  [u'Read.txt', u'读.txt']
+        for assert_file_name in ASSET_FILE_NAMES:
+            REMOTE_PATH = join(UNIQUE_PATH, assert_file_name)
+
+            test_file = six.BytesIO()
+            test_file.write(u"你好世界 Hello World".encode('utf-8'))
+            test_file.seek(0)
+            self.storage.save(REMOTE_PATH, test_file)
+
+            url = self.storage.url(REMOTE_PATH)
+
+            re_results = EXPIRES_RE.findall(url)
+            self.assertEqual(len(re_results), 2)
+            self.assertTrue(-3 < int(re_results[0]) - self.storage.private_url_expires - time.time() < 3)
+
+            response = requests.get(url)
+            self.assertTrue(response.content.startswith(u'你好'.encode('utf-8')))
 
     @classmethod
     def teardown_class(cls):

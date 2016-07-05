@@ -45,6 +45,8 @@ QINIU_SECRET_KEY = get_qiniu_config('QINIU_SECRET_KEY')
 QINIU_BUCKET_NAME = get_qiniu_config('QINIU_BUCKET_NAME')
 QINIU_BUCKET_DOMAIN = get_qiniu_config('QINIU_BUCKET_DOMAIN', '').rstrip('/')
 QINIU_SECURE_URL = get_qiniu_config('QINIU_SECURE_URL', 'False')
+QINIU_PRIVATE_URL = get_qiniu_config('QINIU_PRIVATE_URL', 'False')
+QINIU_PRIVATE_URL_EXPIRES = get_qiniu_config('QINIU_PRIVATE_URL_EXPIRES', '3600')
 
 
 if isinstance(QINIU_SECURE_URL, six.string_types):
@@ -52,6 +54,15 @@ if isinstance(QINIU_SECURE_URL, six.string_types):
         QINIU_SECURE_URL = True
     else:
         QINIU_SECURE_URL = False
+
+if isinstance(QINIU_PRIVATE_URL, six.string_types):
+    if QINIU_PRIVATE_URL.lower() in ('true', '1'):
+        QINIU_PRIVATE_URL = True
+    else:
+        QINIU_PRIVATE_URL = False
+
+if isinstance(QINIU_PRIVATE_URL_EXPIRES, six.string_types):
+    QINIU_PRIVATE_URL_EXPIRES = int(QINIU_PRIVATE_URL_EXPIRES)
 
 
 class QiniuStorage(Storage):
@@ -66,13 +77,17 @@ class QiniuStorage(Storage):
             secret_key=QINIU_SECRET_KEY,
             bucket_name=QINIU_BUCKET_NAME,
             bucket_domain=QINIU_BUCKET_DOMAIN,
-            secure_url=QINIU_SECURE_URL):
+            secure_url=QINIU_SECURE_URL,
+            private_url=QINIU_PRIVATE_URL,
+            private_url_expires=QINIU_PRIVATE_URL_EXPIRES):
 
         self.auth = Auth(access_key, secret_key)
         self.bucket_name = bucket_name
         self.bucket_domain = bucket_domain
         self.bucket_manager = BucketManager(self.auth)
         self.secure_url = secure_url
+        self.private_url = private_url
+        self.private_url_expires = private_url_expires
 
     def _clean_name(self, name):
         """
@@ -194,7 +209,11 @@ class QiniuStorage(Storage):
         name = self._normalize_name(self._clean_name(name))
         name = filepath_to_uri(name)
         protocol = u'https://' if self.secure_url else u'http://'
-        return urljoin(protocol + self.bucket_domain, name)
+        url = urljoin(protocol + self.bucket_domain, name)
+        if self.private_url:
+            return self.auth.private_download_url(url, self.private_url_expires)
+        else:
+            return url
 
 
 class QiniuMediaStorage(QiniuStorage):

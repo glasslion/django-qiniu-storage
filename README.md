@@ -19,6 +19,8 @@ Django Qiniu Storage 需要以下几个配置才能正常工作。这些配置�
 | QINIU_BUCKET_NAME                      | 用来存放文件的七牛空间(bucket)的名字 |
 | QINIU_BUCKET_DOMAIN                    | 七牛空间(bucket)的域名               |
 | QINIU_SECURE_URL                       | 是否通过 HTTPS 来访问七牛云存储上的资源(若为'是', 可填True, true 或 1；若为'否', 可填False, false 或 0) 默认为否。|
+| QINIU_PRIVATE_URL                      | 是否生成私有空间下载地址。默认为否。   |
+| QINIU_PRIVATE_URL_EXPIRES              | 私有空间下载地址的过期时间。默认为3600秒。 |
 
 关于 HTTPS域名配置的详情， 可以参考七牛官方文档 [如何通过 SSL 的形式来访问七牛云存储上的资源](http://kb.qiniu.com/https-support)
 
