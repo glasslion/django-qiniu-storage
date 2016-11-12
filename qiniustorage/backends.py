@@ -220,6 +220,7 @@ class QiniuPrivateStorage(QiniuStorage):
 
 class QiniuFile(File):
     def __init__(self, name, storage, mode):
+        super(QiniuFile, self).__init__()
         self._storage = storage
         self._name = name[len(self._storage.location):].lstrip('/')
         self._mode = mode
