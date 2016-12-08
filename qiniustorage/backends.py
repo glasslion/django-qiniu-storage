@@ -109,6 +109,7 @@ class QiniuStorage(Storage):
         return final_path.lstrip('/')
 
     def _open(self, name, mode='rb'):
+        name = self._normalize_name(self._clean_name(name))
         return QiniuFile(name, self, mode)
 
     def _save(self, name, content):
@@ -205,11 +206,11 @@ class QiniuMediaStorage(QiniuStorage):
             "For general use, please choose QiniuPrivateStorage instead."
             , DeprecationWarning)
         super(QiniuMediaStorage, self).__init__(*args, **kwargs)
-    location = settings.MEDIA_ROOT
+    location = getattr(settings, "QINIU_MEDIA_PREFIX", "media")
 
 
 class QiniuStaticStorage(QiniuMediaStorage):
-    location = settings.STATIC_ROOT or "static"
+    location = getattr(settings, "QINIU_STATIC_PREFIX", "static")
 
 
 class QiniuPrivateStorage(QiniuStorage):
