@@ -109,6 +109,7 @@ class QiniuStorage(Storage):
         return final_path.lstrip('/')
 
     def _open(self, name, mode='rb'):
+        name = self._normalize_name(self._clean_name(name))
         return QiniuFile(name, self, mode)
 
     def _save(self, name, content):
