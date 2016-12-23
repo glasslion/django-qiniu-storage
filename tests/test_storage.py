@@ -19,8 +19,7 @@ import pytest
 from requests.exceptions import ConnectionError
 
 
-from qiniu import set_default, BucketManager
-from qiniu.config import Zone
+from qiniu import set_default, BucketManager, Zone
 
 zone_overseas = Zone('up.qiniug.com', 'upload.qiniug.com')
 
