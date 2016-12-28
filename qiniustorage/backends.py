@@ -124,7 +124,7 @@ class QiniuStorage(Storage):
         return cleaned_name
 
     def _put_file(self, name, content):
-        token = self.auth.upload_token(self.bucket_name)
+        token = self.auth.upload_token(self.bucket_name, name)
         ret, info = put_data(token, name, content)
         if ret is None or ret['key'] != name:
             raise QiniuError(info)
