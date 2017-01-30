@@ -86,5 +86,5 @@ setup(
 
     # List run-time dependencies here.  These will be installed by pip when your
     # project is installed.
-    install_requires = ['qiniu>=7.0.1', 'six', 'requests'],
+    install_requires = ['qiniu>=7.1.0', 'six', 'requests'],
 )
