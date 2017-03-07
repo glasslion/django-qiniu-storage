@@ -22,6 +22,10 @@ from django.utils.encoding import force_text, force_bytes, filepath_to_uri
 
 from .utils import QiniuError, bucket_lister
 
+import sys
+reload(sys)
+sys.setdefaultencoding('utf-8’)
+
 
 def get_qiniu_config(name, default=None):
     """
