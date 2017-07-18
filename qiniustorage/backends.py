@@ -19,6 +19,7 @@ from django.core.files.base import File
 from django.core.files.storage import Storage
 from django.core.exceptions import ImproperlyConfigured, SuspiciousOperation
 from django.utils.encoding import force_text, force_bytes, filepath_to_uri
+from django.utils.deconstruct import deconstructible
 
 from .utils import QiniuError, bucket_lister
 
@@ -53,7 +54,7 @@ if isinstance(QINIU_SECURE_URL, six.string_types):
     else:
         QINIU_SECURE_URL = False
 
-
+@deconstructible
 class QiniuStorage(Storage):
     """
     Qiniu Storage Service
