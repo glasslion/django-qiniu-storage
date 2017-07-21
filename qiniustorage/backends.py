@@ -221,6 +221,7 @@ class QiniuFile(File):
         self.file = six.BytesIO()
         self._is_dirty = False
         self._is_read = False
+        super(QiniuFile, self).__init__(self.file，self._name)
 
     @property
     def size(self):
