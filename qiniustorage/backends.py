@@ -97,7 +97,7 @@ class QiniuStorage(Storage):
         the directory specified by the LOCATION setting.
         """
 
-        base_path = force_text(self.location)
+        base_path = force_text(os.path.basename(self.location))
         base_path = base_path.rstrip('/')
 
         final_path = urljoin(base_path.rstrip('/') + "/", name)
