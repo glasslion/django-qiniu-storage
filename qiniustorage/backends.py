@@ -200,11 +200,11 @@ class QiniuMediaStorage(QiniuStorage):
             "For general use, please choose QiniuPrivateStorage instead."
             , DeprecationWarning)
         super(QiniuMediaStorage, self).__init__(*args, **kwargs)
-    location = settings.MEDIA_ROOT
+    location = os.path.basename(settings.MEDIA_ROOT)
 
 
 class QiniuStaticStorage(QiniuStorage):
-    location = settings.STATIC_ROOT or "static"
+    location = os.path.basename(settings.STATIC_ROOT) or "static"
 
 
 class QiniuPrivateStorage(QiniuStorage):
