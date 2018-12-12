@@ -8,8 +8,11 @@ import posixpath
 import warnings
 
 import six
-from six.moves import cStringIO as StringIO
-from six.moves.urllib_parse import urljoin, urlparse
+
+try:
+    from six.moves.urllib_parse import urljoin, urlparse
+except ImportError:
+    from urllib.parse import urljoin, urlparse
 
 from qiniu import Auth, BucketManager, put_data
 import requests
@@ -47,12 +50,12 @@ QINIU_BUCKET_NAME = get_qiniu_config('QINIU_BUCKET_NAME')
 QINIU_BUCKET_DOMAIN = get_qiniu_config('QINIU_BUCKET_DOMAIN', '').rstrip('/')
 QINIU_SECURE_URL = get_qiniu_config('QINIU_SECURE_URL', 'False')
 
-
 if isinstance(QINIU_SECURE_URL, six.string_types):
     if QINIU_SECURE_URL.lower() in ('true', '1'):
         QINIU_SECURE_URL = True
     else:
         QINIU_SECURE_URL = False
+
 
 @deconstructible
 class QiniuStorage(Storage):
@@ -200,6 +203,7 @@ class QiniuMediaStorage(QiniuStorage):
             "For general use, please choose QiniuPrivateStorage instead."
             , DeprecationWarning)
         super(QiniuMediaStorage, self).__init__(*args, **kwargs)
+
     location = settings.MEDIA_ROOT
 
 
@@ -221,6 +225,7 @@ class QiniuFile(File):
         self.file = six.BytesIO()
         self._is_dirty = False
         self._is_read = False
+        super(QiniuFile, self).__init__(self.file, name)
 
     @property
     def size(self):
