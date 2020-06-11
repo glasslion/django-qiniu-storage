@@ -1,7 +1,7 @@
-Django>=1.5
+Django>2
 requests
 six
-qiniu==7.1.0
+qiniu==7.2.8
 
 # Tests
-pytest
+pytest-django

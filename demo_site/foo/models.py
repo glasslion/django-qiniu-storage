@@ -5,6 +5,7 @@ from django.contrib import admin
 class Photo(models.Model):
     image = models.ImageField(upload_to='photos/%Y/%m/%d')
 
+
 class Attachment(models.Model):
     attachment = models.FileField()
 

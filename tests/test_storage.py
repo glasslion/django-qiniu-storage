@@ -1,5 +1,4 @@
 # -*- coding: utf-8 -*-
-from __future__ import absolute_import, unicode_literals, print_function
 from datetime import datetime
 import os
 from os.path import dirname, join
@@ -8,49 +7,35 @@ import time
 import unittest
 import uuid
 
+import io
+import pytest
+from requests.exceptions import ConnectionError
+from qiniu import BucketManager, Zone
 import logging
+from .utils import retry
+
 LOGGING_FORMAT = '\n%(levelname)s %(asctime)s %(message)s'
 logging.basicConfig(level=logging.INFO, format=LOGGING_FORMAT)
 logger = logging.getLogger(__name__)
 
-import six
-import django
-import pytest
-from requests.exceptions import ConnectionError
-
-
-from qiniu import set_default, BucketManager, Zone
-
 zone_overseas = Zone('up.qiniug.com', 'upload.qiniug.com')
-
-
-
-from .utils import retry
-
 
 # Add repo/demo_site to sys.path
 DEMO_SITE_DIR = join(dirname(dirname(__file__)), 'demo_site')
 sys.path.append(DEMO_SITE_DIR)
 os.environ.setdefault("DJANGO_SETTINGS_MODULE", "demo_site.settings")
 
-try:
-    django.setup()
-except AttributeError:
-   # Setup isn't necessary in Django < 1.7
-   pass
-
-from django.conf import settings
-from qiniustorage.backends import QiniuStorage, QiniuFile
+from qiniustorage.backends import QiniuStorage, QiniuFile, QiniuPrivateStorage, get_qiniu_config
 from qiniustorage.utils import QiniuError
-
 USING_TRAVIS = os.environ.get('USING_TRAVIS', None) is None
 
 UNIQUE_PATH = str(uuid.uuid4())
 
 
-class QiniuStorageTest(unittest.TestCase):
-    def setUp(self):
-        self.storage = QiniuStorage()
+class StorageTestMixin:
+    @property
+    def storage(self):
+        raise NotImplemented()
 
     def test_file_init(self):
         fil = QiniuFile('foo', self.storage, mode='rb')
@@ -73,7 +58,7 @@ class QiniuStorageTest(unittest.TestCase):
             content = u"你好世界 Hello World"
 
             # get file size
-            dummy_file = six.BytesIO()
+            dummy_file = io.BytesIO()
             dummy_file.write(content.encode('utf-8'))
             dummy_file.seek(0, os.SEEK_END)
             file_size = dummy_file.tell()
@@ -94,7 +79,7 @@ class QiniuStorageTest(unittest.TestCase):
             assert time_delta.seconds < 180
 
             self.storage.delete(REMOTE_PATH)
-            assert self.storage.exists(REMOTE_PATH) == False
+            assert not self.storage.exists(REMOTE_PATH)
 
     @retry(ConnectionError,tries=10, backoff=1, logger=logger)
     def test_read_file(self):
@@ -102,7 +87,7 @@ class QiniuStorageTest(unittest.TestCase):
         for assert_file_name in ASSET_FILE_NAMES:
             REMOTE_PATH = join(UNIQUE_PATH, assert_file_name)
 
-            test_file = six.BytesIO()
+            test_file = io.BytesIO()
             test_file.write(u"你好世界 Hello World".encode('utf-8'))
             test_file.seek(0)
             self.storage.save(REMOTE_PATH, test_file)
@@ -139,7 +124,6 @@ class QiniuStorageTest(unittest.TestCase):
         fil.close()
         assert self.storage.exists(REMOTE_PATH) == True
 
-
     @retry(QiniuError, tries=10, backoff=1, logger=logger)
     def test_listdir(self):
         dirnames = ['', 'foo', 'bar']
@@ -158,28 +142,35 @@ class QiniuStorageTest(unittest.TestCase):
         assert dirs == []
         assert sorted(files) == sorted(filenames)
 
-
     @classmethod
     def teardown_class(cls):
         """Delete all files in the test bucket.
         """
-        storage = QiniuStorage()
-        auth = storage.auth
+        auth = cls.storage.auth
         bucket = BucketManager(auth)
 
         while True:
-            ret, eof, info = bucket.list(storage.bucket_name, limit=100)
+            ret, eof, info = bucket.list(cls.storage.bucket_name, limit=100)
 
             if ret is None:
-                print(info)
+                print("==ret is None: %s==", str(info))
                 break
 
             for item in ret['items']:
                 name = item['key']
-                if six.PY2:
-                    name = name.encode('utf-8')
-                ret, info = bucket.delete(storage.bucket_name, name)
-                if ret is None:
-                    print(info)
+                _ret, _info = bucket.delete(cls.storage.bucket_name, name)
+                if _ret is None:
+                    print("    ---%s---" % str(_info))
             if eof:
                 break
+
+
+class QiniuStorageTest(StorageTestMixin, unittest.TestCase):
+    storage = QiniuStorage()
+
+
+class QiniuPRStorageTest(StorageTestMixin, unittest.TestCase):
+    storage = QiniuPrivateStorage(
+            bucket_name=get_qiniu_config('QINIU_PRIVATE_BUCKET_NAME'),
+            bucket_domain=get_qiniu_config('QINIU_PRIVATE_BUCKET_DOMAIN'),
+        )
