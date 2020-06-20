@@ -1,7 +1,7 @@
 language: python
 
 install:
-- echo pytest-cov >> requirements.txt
+- echo "pytest-cov<=2.9.0" >> requirements.txt
 - echo pytest-django >> requirements.txt
 - pip install -r requirements.txt
 - pip install django$DJANGO_VERSION
