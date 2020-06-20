@@ -51,7 +51,7 @@ It's hosted on the [Read The Doc](http://django-qiniu-storage.readthedocs.org/zh
 ).
 
 ## Changelog
-
+- 3.0.1 使用 7.2.8 版本的 Python SDK. 不再支持Python2 和 Python3.5以下的版本，以及Django 2.2以下的版本.
 - 2.0.0 使用 7.x 版本的 Python SDK。同时支持 Python 2 和 Python 3， 但也因此不再支持 Django 1.4。
 - 新建 ”1.x“ 分支。 今后主分支将使用 7.x 版本的 Python SDK。2.x 会同时支持 Python 2 和 Python 3。
 - 1.2.0 主要是测试方面的改进。利用 Travic CI 对 (Python 2.6, 2.7)×( Django 1.4 -1.7) 的每个组合都跑一遍单元测试。
