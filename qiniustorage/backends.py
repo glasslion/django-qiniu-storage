@@ -137,7 +137,8 @@ class QiniuStorage(Storage):
         name = self._normalize_name(self._clean_name(name))
         ret, info = self.bucket_manager.delete(self.bucket_name, name)
 
-        if ret is None or info.status_code == 612:
+        # Django don't raise FileNotFoundError.
+        if info.status_code not in [200, 612]:
             raise QiniuError(info)
 
     def _file_stat(self, name, silent=False):
