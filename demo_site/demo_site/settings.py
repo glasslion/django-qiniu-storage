@@ -4,7 +4,6 @@ from os.path import dirname, join
 BASE_DIR = dirname(dirname(__file__))
 
 DEBUG = True
-TEMPLATE_DEBUG = DEBUG
 
 ADMINS = (
     # ('Your Name', 'your_email@example.com'),
@@ -36,7 +35,7 @@ TIME_ZONE = 'UTC'
 
 # Language code for this installation. All choices can be found here:
 # http://www.i18nguy.com/unicode/language-identifiers.html
-LANGUAGE_CODE = 'en-us'
+LANGUAGE_CODE = 'zh-hans'
 
 SITE_ID = 1
 
@@ -68,7 +67,7 @@ STATIC_ROOT = ''
 
 # URL prefix for static files.
 # Example: "http://example.com/static/", "http://static.example.com/"
-STATIC_URL = 'https://dn-django-qiniu-storage.qbox.me/static/'
+STATIC_URL = 'https://your/qiniu/domain/name/static/'
 
 # Additional locations of static files
 STATICFILES_DIRS = (
@@ -88,33 +87,35 @@ STATICFILES_FINDERS = (
 # Make this unique, and don't share it with anybody.
 SECRET_KEY = '9=mp)3*)4=bf_)-rf^4&34shdwqsmtn%bh#!lw^s$1i=#c4s&@'
 
-# List of callables that know how to import templates from various sources.
-TEMPLATE_LOADERS = (
-    'django.template.loaders.filesystem.Loader',
-    'django.template.loaders.app_directories.Loader',
-#     'django.template.loaders.eggs.Loader',
-)
-
-MIDDLEWARE_CLASSES = (
-    'django.middleware.common.CommonMiddleware',
+MIDDLEWARE = [
+    'django.middleware.security.SecurityMiddleware',
     'django.contrib.sessions.middleware.SessionMiddleware',
+    'django.middleware.common.CommonMiddleware',
     'django.middleware.csrf.CsrfViewMiddleware',
     'django.contrib.auth.middleware.AuthenticationMiddleware',
     'django.contrib.messages.middleware.MessageMiddleware',
-    # Uncomment the next line for simple clickjacking protection:
-    # 'django.middleware.clickjacking.XFrameOptionsMiddleware',
-)
+    'django.middleware.clickjacking.XFrameOptionsMiddleware',
+]
 
 ROOT_URLCONF = 'demo_site.urls'
 
+TEMPLATES = [
+    {
+        'BACKEND': 'django.template.backends.django.DjangoTemplates',
+        'DIRS': [],
+        'APP_DIRS': True,
+        'OPTIONS': {
+            'context_processors': [
+                'django.template.context_processors.debug',
+                'django.template.context_processors.request',
+                'django.contrib.auth.context_processors.auth',
+                'django.contrib.messages.context_processors.messages',
+            ],
+        },
+    },
+]
 # Python dotted path to the WSGI application used by Django's runserver.
 WSGI_APPLICATION = 'demo_site.wsgi.application'
-
-TEMPLATE_DIRS = (
-    # Put strings here, like "/home/html/django_templates" or "C:/www/django/templates".
-    # Always use forward slashes, even on Windows.
-    # Don't forget to use absolute paths, not relative paths.
-)
 
 INSTALLED_APPS = (
     'django.contrib.auth',
@@ -123,7 +124,9 @@ INSTALLED_APPS = (
     'django.contrib.sites',
     'django.contrib.messages',
     'django.contrib.staticfiles',
-    'qiniustorage',
+
+    # Add this instead to do check before running
+    'qiniustorage.apps.QiniuStorageConfig',
     'foo',
     'bar',
     # Uncomment the next line to enable the admin:
@@ -165,7 +168,7 @@ LOGGING = {
 # auth
 AUTHENTICATION_BACKENDS = (
     'django.contrib.auth.backends.ModelBackend',
-    'demo_site.auth.SettingsBackend',
+    'foo.auth.SettingsBackend',
 )
 
 ADMIN_LOGIN = 'admin'
@@ -175,3 +178,13 @@ DEFAULT_FILE_STORAGE = 'qiniustorage.backends.QiniuMediaStorage'
 STATICFILES_STORAGE = 'qiniustorage.backends.QiniuStaticStorage'
 
 QINIU_SECURE_URL = False
+#
+
+QINIU_BUCKET_NAME = "your/bucket/name"
+QINIU_BUCKET_DOMAIN = "your/bucket/domain"
+QINIU_ACCESS_KEY = "your/access/key"
+QINIU_SECRET_KEY = "your/secret/key"
+
+#  Below are for tests
+QINIU_PRIVATE_BUCKET_NAME = "your/private/bucket/name"
+QINIU_PRIVATE_BUCKET_DOMAIN = 'your/private/bucket/domain'

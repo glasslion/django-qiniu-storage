@@ -1,9 +1,8 @@
 from setuptools import setup, find_packages
 import codecs
 import os
-import re
 
-if os.environ.get('USER','') == 'vagrant':
+if os.environ.get('USER', '') == 'vagrant':
     del os.link
 
 
@@ -18,7 +17,7 @@ except IOError:
 
 setup(
     name="django-qiniu-storage",
-    version='2.3.1',
+    version='3.0.1',
     description="Django storage for Qiniu Cloud Storage",
     long_description=long_description,
 
@@ -48,14 +47,11 @@ setup(
         'License :: OSI Approved :: MIT License',
 
         # Specify the Python versions you support here. In particular, ensure
-        # that you indicate whether you support Python 2, Python 3 or both.
-        'Programming Language :: Python :: 2',
-        'Programming Language :: Python :: 2.6',
-        'Programming Language :: Python :: 2.7',
-        'Programming Language :: Python :: 3',
-        'Programming Language :: Python :: 3.3',
-        'Programming Language :: Python :: 3.4',
+        # that you indicate whether you support Python 3.5 or above.
         'Programming Language :: Python :: 3.5',
+        'Programming Language :: Python :: 3.6',
+        'Programming Language :: Python :: 3.7',
+        'Programming Language :: Python :: 3.8',
     ],
 
     # What does your project relate to?
@@ -63,9 +59,9 @@ setup(
 
     # You can just specify the packages manually here if your project is
     # simple. Or you can use find_packages.
-    packages=find_packages(exclude=["contrib", "docs", "tests*","demo-project"]),
+    packages=find_packages(exclude=["contrib", "docs", "tests*", "demo-project"]),
 
     # List run-time dependencies here.  These will be installed by pip when your
     # project is installed.
-    install_requires = ['qiniu>=7.1.0', 'six', 'requests'],
+    install_requires = ['qiniu>=7.2.8', 'requests'],
 )

@@ -7,9 +7,8 @@ import os
 import posixpath
 import warnings
 
-import six
-from six.moves import cStringIO as StringIO
-from six.moves.urllib_parse import urljoin, urlparse
+import io
+from urllib.parse import urljoin
 
 from qiniu import Auth, BucketManager, put_data
 import requests
@@ -18,7 +17,7 @@ from django.conf import settings
 from django.core.files.base import File
 from django.core.files.storage import Storage
 from django.core.exceptions import ImproperlyConfigured, SuspiciousOperation
-from django.utils.encoding import force_text, force_bytes, filepath_to_uri
+from django.utils.encoding import force_str, force_bytes, filepath_to_uri
 from django.utils.deconstruct import deconstructible
 
 from .utils import QiniuError, bucket_lister
@@ -31,7 +30,7 @@ def get_qiniu_config(name, default=None):
     """
     config = os.environ.get(name, getattr(settings, name, default))
     if config is not None:
-        if isinstance(config, six.string_types):
+        if isinstance(config, str):
             return config.strip()
         else:
             return config
@@ -48,11 +47,12 @@ QINIU_BUCKET_DOMAIN = get_qiniu_config('QINIU_BUCKET_DOMAIN', '').rstrip('/')
 QINIU_SECURE_URL = get_qiniu_config('QINIU_SECURE_URL', 'False')
 
 
-if isinstance(QINIU_SECURE_URL, six.string_types):
+if isinstance(QINIU_SECURE_URL, str):
     if QINIU_SECURE_URL.lower() in ('true', '1'):
         QINIU_SECURE_URL = True
     else:
         QINIU_SECURE_URL = False
+
 
 @deconstructible
 class QiniuStorage(Storage):
@@ -97,7 +97,7 @@ class QiniuStorage(Storage):
         the directory specified by the LOCATION setting.
         """
 
-        base_path = force_text(self.location)
+        base_path = force_str(self.location)
         base_path = base_path.rstrip('/')
 
         final_path = urljoin(base_path.rstrip('/') + "/", name)
@@ -135,17 +135,14 @@ class QiniuStorage(Storage):
 
     def delete(self, name):
         name = self._normalize_name(self._clean_name(name))
-        if six.PY2:
-            name = name.encode('utf-8')
         ret, info = self.bucket_manager.delete(self.bucket_name, name)
 
-        if ret is None or info.status_code == 612:
+        # Django don't raise FileNotFoundError.
+        if info.status_code not in [200, 612]:
             raise QiniuError(info)
 
     def _file_stat(self, name, silent=False):
         name = self._normalize_name(self._clean_name(name))
-        if six.PY2:
-            name = name.encode('utf-8')
         ret, info = self.bucket_manager.stat(self.bucket_name, name)
         if ret is None and not silent:
             raise QiniuError(info)
@@ -210,7 +207,7 @@ class QiniuStaticStorage(QiniuStorage):
 class QiniuPrivateStorage(QiniuStorage):
     def url(self, name):
         raw_url = super(QiniuPrivateStorage, self).url(name)
-        return force_text(self.auth.private_download_url(raw_url))
+        return force_str(self.auth.private_download_url(raw_url))
 
 
 class QiniuFile(File):
@@ -218,7 +215,7 @@ class QiniuFile(File):
         self._storage = storage
         self._name = name[len(self._storage.location):].lstrip('/')
         self._mode = mode
-        self.file = six.BytesIO()
+        self.file = io.BytesIO()
         self._is_dirty = False
         self._is_read = False
 
@@ -238,7 +235,7 @@ class QiniuFile(File):
     def read(self, num_bytes=None):
         if not self._is_read:
             content = self._storage._read(self._name)
-            self.file = six.BytesIO(content)
+            self.file = io.BytesIO(content)
             self._is_read = True
 
         if num_bytes is None:
@@ -249,7 +246,7 @@ class QiniuFile(File):
         if 'b' in self._mode:
             return data
         else:
-            return force_text(data)
+            return force_str(data)
 
     def write(self, content):
         if 'w' not in self._mode:
