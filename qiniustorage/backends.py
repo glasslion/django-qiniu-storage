@@ -18,7 +18,11 @@ from django.conf import settings
 from django.core.files.base import File
 from django.core.files.storage import Storage
 from django.core.exceptions import ImproperlyConfigured, SuspiciousOperation
-from django.utils.encoding import force_text, force_bytes, filepath_to_uri
+try:
+    from django.utils.encoding import force_text
+except ImportError:
+    from django.utils.encoding import force_str as force_text
+from django.utils.encoding import force_bytes, filepath_to_uri
 from django.utils.deconstruct import deconstructible
 
 from .utils import QiniuError, bucket_lister
